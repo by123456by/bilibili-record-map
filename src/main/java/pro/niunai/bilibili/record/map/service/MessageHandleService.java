@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pro.niunai.bilibili.record.map.pojo.Msg;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -17,8 +20,10 @@ import java.util.zip.Inflater;
  * @author 本間Saki
  */
 @Slf4j
+@Component
 public class MessageHandleService {
-
+	@Autowired
+	private MapHandleService mapHandleService;
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {
@@ -32,6 +37,10 @@ public class MessageHandleService {
 					JSONArray userJson = info.getJSONArray(2);
 					String name = userJson.getString(1);
 					log.debug("收到用户:【{}】发送到弹幕:【{}】", name, msg);
+					Msg m = new Msg();
+					m.setName(name);
+					m.setMsg(msg);
+					mapHandleService.msg(m);
 				}
 			}
 

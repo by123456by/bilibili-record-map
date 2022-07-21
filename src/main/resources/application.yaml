@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:map.sqlite # 创建的sqlite数据库所在路径
+    username: # 因为没有用户名和密码，所以这两个参数就没有值
+    password:
+    driver-class-name: org.sqlite.JDBC # sqlite驱动
+
+# mybatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml # 配置mapper.xml文件路径
+  type-aliases-package: pro.niunai.bilibili.record.map.pojo # 实体类包名
+  configuration:
+    map-underscore-to-camel-case: true
+# mybatis 打印SQL, 配置后就会在控制台打印执行的SQL语句
+logging:
+  level:
+    logging.level.pro.niunai.bilibili.record.map: trace
