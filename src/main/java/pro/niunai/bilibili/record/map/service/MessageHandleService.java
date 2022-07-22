@@ -22,8 +22,7 @@ import java.util.zip.Inflater;
 @Slf4j
 @Component
 public class MessageHandleService {
-	@Autowired
-	private MapHandleService mapHandleService;
+	private MapHandleService mapHandleService = new MapHandleService();
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {
