@@ -15,6 +15,7 @@ import java.util.List;
 public class MapInfo {
 	private String userName;
 	private String danmu;
+	private String map;
 	private LocalDateTime createTime;
 	@JsonProperty("name")
 	private String name;
@@ -24,6 +25,8 @@ public class MapInfo {
 	private String uploadedPretty;
 	@JsonProperty("uploaded")
 	private Integer uploaded;
+	@JsonProperty("data_id")
+	private Integer dataId;
 	@JsonProperty("course_id")
 	private String courseId;
 	@JsonProperty("game_style_name")
@@ -54,6 +57,8 @@ public class MapInfo {
 	private Integer numComments;
 	@JsonProperty("clear_condition")
 	private Long clearCondition;
+	@JsonProperty("clear_condition_name")
+	private String clearConditionName;
 	@JsonProperty("clear_condition_magnitude")
 	private Integer clearConditionMagnitude;
 	@JsonProperty("clears")

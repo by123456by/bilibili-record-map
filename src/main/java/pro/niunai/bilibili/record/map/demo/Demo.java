@@ -6,6 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 import pro.niunai.bilibili.record.map.service.MapHandleService;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -13,10 +16,11 @@ import java.util.List;
  */
 public class Demo {
 	public static void main(String[] args) {
-		MapHandleService mapHandleService = new MapHandleService();
-		Msg m = new Msg();
-		m.setName("");
-		m.setMsg("SQG-9NT-9GF");
-		mapHandleService.msg(m);
+//		MapHandleService mapHandleService = new MapHandleService();
+//		Msg m = new Msg();
+//		m.setName("");
+//		m.setMsg("SQG-9NT-9GF");
+//		mapHandleService.msg(m);
+
 	}
 }

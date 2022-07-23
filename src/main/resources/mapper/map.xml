@@ -1,72 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="pro.niunai.bilibili.record.map.mapper.map">
+<mapper namespace="pro.niunai.bilibili.record.map.mapper.MapMapper">
 
     <insert id="insert">
-        insert into generic(id,
-                            name,
-                            description,
-                            uploaded_pretty,
-                            uploaded,
-                            data_id,
-                            course_id,
-                            game_style_name,
-                            game_style,
-                            theme_name,
-                            theme,
-                            difficulty_name,
-                            difficulty,
-                            world_record_pretty,
-                            world_record,
-                            upload_time_pretty,
-                            upload_time,
-                            num_comments,
-                            clear_condition,
-                            clear_condition_name,
-                            clear_condition_magnitude,
-                            clears,
-                            attempts,
-                            clear_rate,
-                            plays,
-                            versus_matches,
-                            coop_matches,
-                            likes,
-                            boos,
-                            unique_players_and_versus,
-                            weekly_likes,
-                            weekly_plays)
-        values (userName,
-                danmu,
-                createTime,
-                name,
-                description,
-                uploadedPretty,
-                uploaded,
-                courseId,
-                gameStyleName,
-                gameStyle,
-                themeName,
-                theme,
-                difficultyName,
-                difficulty,
-                worldRecordPretty,
-                worldRecord,
-                uploadTimePretty,
-                uploadTime,
-                numComments,
-                clearCondition,
-                clearConditionMagnitude,
-                clears,
-                attempts,
-                clearRate,
-                plays,
-                versusMatches,
-                coopMatches,
-                likes,
-                boos,
-                uniquePlayersAndVersus,
-                weeklyLikes,
-                weeklyPlays,)
+        insert into map(user_name, danmu, map, create_timestamp, name, description, uploaded_pretty, uploaded, dataId,
+                        courseId, game_style_name, game_style, theme_name, theme, difficulty_name, difficulty,
+                        tags_name, tags, world_record_pretty, world_record, upload_time_pretty, upload_time,
+                        num_comments, clear_condition_text, clear_condition_name, clear_condition_magnitude, clears,
+                        attempts, versus_matches, plays, clear_rate, coop_matches, likes, boos,
+                        unique_players_and_versus, weekly_likes, weekly_plays, status, is_map)
+        VALUES (#{userName}, #{danmu}, #{map}, #{createTimestamp}, #{name}, #{description}, #{uploadedPretty},
+                #{uploaded},
+                #{dataId}, #{courseId}, #{gameStyleName}, #{gameStyle}, #{themeName}, #{theme}, #{difficultyName},
+                #{difficulty}, #{tagsName}, #{tags}, #{worldRecordPretty}, #{worldRecord}, #{uploadTimePretty},
+                #{uploadTime}, #{numComments}, #{clearConditionText}, #{clearConditionName}, #{clearConditionMagnitude},
+                #{clears}, #{attempts}, #{versusMatches}, #{plays}, #{clearRate}, #{coopMatches}, #{likes}, #{boos},
+                #{uniquePlayersAndVersus}, #{weeklyLikes}, #{weeklyPlays}, #{status}, #{isMap})
     </insert>
+    <select id="selectByMap" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
+        select *
+        from map
+        where map = #{map}
+    </select>
 </mapper>

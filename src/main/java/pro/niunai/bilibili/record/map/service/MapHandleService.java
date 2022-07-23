@@ -1,17 +1,15 @@
 package pro.niunai.bilibili.record.map.service;
 
-import ch.qos.logback.core.pattern.util.IEscapeUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.Msg;
+import pro.niunai.bilibili.record.map.pojo.MapVO;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,10 +23,10 @@ import java.util.regex.Pattern;
 //发送给前端后台
 //发送给前端用户端
 public class MapHandleService {
-	public void msg(Msg msg) {
+	public MapVO msg(Msg msg) {
 		String mapText = toMap(msg.getMsg());
 		if (mapText == null) {
-			return;
+			return null;
 		}
 		int i = verifyMap(mapText);
 		if (i == 0) {
@@ -41,17 +39,41 @@ public class MapHandleService {
 			mapInfo.setUserName(msg.getName());
 			mapInfo.setDanmu(msg.getMsg());
 			mapInfo.setCreateTime(LocalDateTime.now());
-			System.out.println("mapInfo = " + mapInfo);
+			mapInfo.setMap(mapText);
 
+			MapVO mapVO = new MapVO();
+			BeanUtils.copyProperties(mapInfo, mapVO);
+
+			StringBuilder sbTagsName = new StringBuilder();
+			mapInfo.getTagsName().forEach(tag -> {
+				sbTagsName.append(",").append(tag);
+			});
+			mapVO.setTagsName(sbTagsName.substring(1));
+
+			StringBuilder sbTags = new StringBuilder();
+			mapInfo.getTags().forEach(tag -> {
+				sbTags.append(",").append(tag);
+			});
+			mapVO.setTags(sbTags.substring(1));
+
+			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
+			mapVO.setCreateTimestamp((int) (System.currentTimeMillis()/1000));
+			mapVO.setIsMap(1);
+			mapVO.setStatus("未玩");
+			log.debug("解析地图信息：{}", mapVO);
+			return mapVO;
 		}
+
+		return null;
 	}
 
 	/**
 	 * 将弹幕消息预处理成图号
+	 *
 	 * @param text 消息
 	 * @return 预处理后的图号
 	 */
-	private String toMap(String text) {
+	public String toMap(String text) {
 		text = text.replaceAll("\\s*", "");
 		text = text.replaceAll("-", "");
 		text = text.replaceAll("_", "");
@@ -69,6 +91,7 @@ public class MapHandleService {
 
 	/**
 	 * 验证图号是否正确
+	 *
 	 * @param text 图号
 	 * @return 0正确 1格式错误 2验证错误 3为工匠号
 	 */
@@ -111,6 +134,7 @@ public class MapHandleService {
 
 	/**
 	 * 获取地图信息
+	 *
 	 * @param map 图号
 	 * @return 地图信息类
 	 */
