@@ -1,5 +1,6 @@
 package pro.niunai.bilibili.record.map.service;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -12,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -39,7 +41,11 @@ public class MessageHandleService {
 					Msg m = new Msg();
 					m.setName(name);
 					m.setMsg(msg);
-					mapHandleService.msg(m);
+
+					HashMap<String, Object> paramMap = new HashMap<>();
+					paramMap.put("msg", msg);
+					paramMap.put("name", name);
+					HttpUtil.post("http://localhost:8080",paramMap);
 				}
 			}
 

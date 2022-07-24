@@ -56,7 +56,7 @@ public class MakeClientService {
 			public void run() {
 				client.send(hexToByteArray(heartByte));
 				log.info("运行正常");
-//				System.out.println("心跳发送成功");
+		//System.out.println("心跳发送成功");
 			}
 		}, 0L, 30000L);
 	}

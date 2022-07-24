@@ -1,5 +1,6 @@
 package pro.niunai.bilibili.record.map.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.MapVO;
 

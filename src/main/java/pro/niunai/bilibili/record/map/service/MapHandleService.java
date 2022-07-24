@@ -4,7 +4,10 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import pro.niunai.bilibili.record.map.mapper.MapMapper;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 import pro.niunai.bilibili.record.map.pojo.MapVO;
@@ -23,6 +26,42 @@ import java.util.regex.Pattern;
 //发送给前端后台
 //发送给前端用户端
 public class MapHandleService {
+	@Autowired
+	MapMapper mapMapper;
+
+	public MapVO addMap(Msg m) {
+		String mapText = toMap(m.getMsg());
+		if (mapText == null) {
+			return null;
+		}
+		log.debug("收到投图信息：{}",m);
+		if (m.getName() == null) {
+			m.setName("乌冬面pp");
+		}
+		if (m.getMsg() == null) {
+			return null;
+		}
+		MapVO mapVO = mapMapper.selectByMap(mapText);
+		if (mapVO == null) {
+			log.debug("数据库未发现地图，准备存入数据库");
+			MapVO msg = msg(m);
+			if (msg == null) {
+				return null;
+			}
+			log.debug("解析地图信息为：{}",m);
+			int r = mapMapper.insert(msg);
+			if (r == 1) {
+				log.debug("数据库存入成功");
+			} else {
+				log.debug("数据库存入失败");
+			}
+			return msg;
+		}
+		log.debug("数据库发现地图");
+		log.debug("解析地图信息为：{}",m);
+		return mapVO;
+	}
+
 	public MapVO msg(Msg msg) {
 		String mapText = toMap(msg.getMsg());
 		if (mapText == null) {
@@ -30,6 +69,7 @@ public class MapHandleService {
 		}
 		int i = verifyMap(mapText);
 		if (i == 0) {
+			//图号正确
 			MapInfo mapInfo = new MapInfo();
 			try {
 				mapInfo = getMapInfo(mapText);
@@ -61,6 +101,28 @@ public class MapHandleService {
 			mapVO.setIsMap(1);
 			mapVO.setStatus("未玩");
 			log.debug("解析地图信息：{}", mapVO);
+			return mapVO;
+		} else if (i == 1) {
+			//格式错误
+		} else if (i == 2) {
+			//验证错误
+		} else if (i == 3) {
+			//工匠号
+			MapInfo mapInfo = new MapInfo();
+
+			mapInfo.setUserName(msg.getName());
+			mapInfo.setDanmu(msg.getMsg());
+			mapInfo.setCreateTime(LocalDateTime.now());
+			mapInfo.setMap(mapText);
+
+			MapVO mapVO = new MapVO();
+			BeanUtils.copyProperties(mapInfo, mapVO);
+
+			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
+			mapVO.setCreateTimestamp((int) (System.currentTimeMillis()/1000));
+			mapVO.setIsMap(0);
+			mapVO.setStatus("未玩");
+			log.debug("解析工匠信息：{}", mapVO);
 			return mapVO;
 		}
 

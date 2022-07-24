@@ -4,8 +4,8 @@
 <mapper namespace="pro.niunai.bilibili.record.map.mapper.MapMapper">
 
     <insert id="insert">
-        insert into map(user_name, danmu, map, create_timestamp, name, description, uploaded_pretty, uploaded, dataId,
-                        courseId, game_style_name, game_style, theme_name, theme, difficulty_name, difficulty,
+        insert into map(user_name, danmu, map, create_timestamp, name, description, uploaded_pretty, uploaded, data_id,
+                        course_id, game_style_name, game_style, theme_name, theme, difficulty_name, difficulty,
                         tags_name, tags, world_record_pretty, world_record, upload_time_pretty, upload_time,
                         num_comments, clear_condition_text, clear_condition_name, clear_condition_magnitude, clears,
                         attempts, versus_matches, plays, clear_rate, coop_matches, likes, boos,

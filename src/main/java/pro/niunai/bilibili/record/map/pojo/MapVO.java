@@ -25,7 +25,7 @@ public class MapVO {
 	private Integer isMap;
 	//图名
 	private String name;
-	//图名
+	//地图简介
 	private String description;
 	//上传时间文本 格式为：15-5-2022 7:34:27
 	private String uploadedPretty;
