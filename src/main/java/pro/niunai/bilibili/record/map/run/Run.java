@@ -2,6 +2,11 @@ package pro.niunai.bilibili.record.map.run;
 
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.conf.ConfigProperties;
 import pro.niunai.bilibili.record.map.service.MakeClientService;
 
@@ -12,7 +17,11 @@ import java.util.Scanner;
 /**
  * @author 本間Saki
  */
-public class Run {
+@Component
+@Slf4j
+public class Run implements ApplicationRunner {
+	@Autowired
+	MakeClientService makeClientService;
 	//0123456789BCDFGHJKLMNPQRSTVWXY-
 	//https://tgrcode.com/mm2/level_info/NBR49DCMF
 	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
@@ -26,4 +35,9 @@ public class Run {
 		new MakeClientService().start();
 	}
 
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		log.info("开始建立链接");
+		makeClientService.start();
+	}
 }

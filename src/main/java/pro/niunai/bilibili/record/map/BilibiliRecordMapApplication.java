@@ -26,7 +26,7 @@ public class BilibiliRecordMapApplication {
 //		if (!("0".equals(line) || "".equals(line))) {
 //			ConfigProperties.writePropertie("roomId", line);
 //		}
-		new MakeClientService().start();
+//		new MakeClientService().start();
 	}
 
 }

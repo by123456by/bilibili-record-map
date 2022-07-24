@@ -2,6 +2,8 @@ package pro.niunai.bilibili.record.map.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.conf.ConfigProperties;
 import pro.niunai.bilibili.record.map.conf.WebSocket;
 
@@ -15,7 +17,10 @@ import java.util.TimerTask;
  * @author 本間Saki
  */
 @Slf4j
+@Component
 public class MakeClientService {
+	@Autowired
+	WebSocket client;
 
 	private final String url;
 
@@ -41,7 +46,7 @@ public class MakeClientService {
 
 	public void start() throws URISyntaxException, InterruptedException, UnsupportedEncodingException {
 		// 建立连接
-		WebSocket client = new WebSocket(url);
+//		WebSocket client = new WebSocket(url);
 		client.connectBlocking();
 
 		// 发送连接参数

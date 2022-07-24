@@ -24,7 +24,10 @@ import java.util.zip.Inflater;
 @Slf4j
 @Component
 public class MessageHandleService {
-	private MapHandleService mapHandleService = new MapHandleService();
+	@Autowired
+	MapHandleService mapHandleService;
+
+//	private MapHandleService mapHandleService = new MapHandleService();
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {
@@ -41,11 +44,11 @@ public class MessageHandleService {
 					Msg m = new Msg();
 					m.setName(name);
 					m.setMsg(msg);
-
-					HashMap<String, Object> paramMap = new HashMap<>();
-					paramMap.put("msg", msg);
-					paramMap.put("name", name);
-					HttpUtil.post("http://localhost:8080",paramMap);
+					mapHandleService.addMap(m);
+//					HashMap<String, Object> paramMap = new HashMap<>();
+//					paramMap.put("msg", msg);
+//					paramMap.put("name", name);
+//					HttpUtil.post("http://localhost:8080",paramMap);
 				}
 			}
 

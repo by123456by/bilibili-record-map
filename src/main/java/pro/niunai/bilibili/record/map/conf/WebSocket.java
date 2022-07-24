@@ -3,6 +3,9 @@ package pro.niunai.bilibili.record.map.conf;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pro.niunai.bilibili.record.map.service.MakeClientService;
 import pro.niunai.bilibili.record.map.service.MessageHandleService;
 
 import java.net.URI;
@@ -14,12 +17,16 @@ import java.util.zip.DataFormatException;
  * @author 本間Saki
  */
 @Slf4j
+@Component
 public class WebSocket extends WebSocketClient {
-
-	public WebSocket(String url) throws URISyntaxException {
-        super(new URI(url));
+    @Autowired
+    MakeClientService makeClientService;
+    @Autowired
+    MessageHandleService messageHandleService;
+	public WebSocket() throws URISyntaxException {
+        super(new URI(ConfigProperties.getProperty("url")));
     }
- 
+
     @Override
     public void onOpen(ServerHandshake shake) {
     }
@@ -27,7 +34,7 @@ public class WebSocket extends WebSocketClient {
     @Override
     public void onMessage(ByteBuffer message) {
         try {
-            new MessageHandleService().messageHandle(message);
+            messageHandleService.messageHandle(message);
         } catch (DataFormatException e) {
             e.printStackTrace();
         }
@@ -38,7 +45,7 @@ public class WebSocket extends WebSocketClient {
 	    log.error("连接关闭");
 //        System.out.println("Closed");
     }
- 
+
     @Override
     public void onError(Exception e) {
         System.out.println(e);
