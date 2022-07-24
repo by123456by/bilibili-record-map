@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.service.MakeClientService;
 import pro.niunai.bilibili.record.map.service.MessageHandleService;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -19,6 +20,7 @@ import java.util.zip.DataFormatException;
 @Slf4j
 @Component
 public class WebSocket extends WebSocketClient {
+
     @Autowired
     MakeClientService makeClientService;
     @Autowired
@@ -42,8 +44,9 @@ public class WebSocket extends WebSocketClient {
 
     @Override
     public void onClose(int paramInt, String paramString, boolean paramBoolean) {
-	    log.error("连接关闭");
-//        System.out.println("Closed");
+	    log.error("连接中断，即将重试");
+
+        //        System.out.println("Closed");
     }
 
     @Override
@@ -55,4 +58,6 @@ public class WebSocket extends WebSocketClient {
     public void onMessage(String message) {
     }
 
+
 }
+
