@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -23,7 +25,7 @@ public class BilibiliRecordMapApplication {
 //		System.out.println(getPath());
 		log.info("加载数据库：{}", YmalUtil.getUrl());
 		SpringApplication.run(BilibiliRecordMapApplication.class, args);
-
+		LocalDateTime.now();
 		String url = "http://localhost:8080/";//填写你项目路由
 		Runtime runtime = Runtime.getRuntime();
 		try {

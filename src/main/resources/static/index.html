@@ -58,5 +58,27 @@
             }
         })
 </script>
+<script>
+    var ws = new WebSocket('ws://' + location.host + '/adminWs');
+    // 连接成功时:
+    ws.addEventListener('open', function (event) {
+        console.log('websocket connected.');
+    });
+    // 收到消息时:
+    ws.addEventListener('message', function (event) {
+        console.log('message: ' + event.data);
+        var msgs = JSON.parse(event.data);
+        console.log(msgs);
+        v.arr.push(msgs);
+        console.log(v.arr);
+    });
+    // 连接关闭时:
+    ws.addEventListener('close', function () {
+        console.log('websocket closed.');
+        ws = new WebSocket('ws://' + location.host + '/adminWs');
+    });
+    // 绑定到全局变量:
+    window.chatWs = ws;
+</script>
 </body>
 </html>

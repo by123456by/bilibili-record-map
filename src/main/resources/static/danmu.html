@@ -57,6 +57,7 @@
     ws.addEventListener('open', function (event) {
         console.log('websocket connected.');
     });
+
     // 收到消息时:
     ws.addEventListener('message', function (event) {
         console.log('message: ' + event.data);

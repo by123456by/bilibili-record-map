@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import pro.niunai.bilibili.record.map.controller.WsServerEndpoint;
+import pro.niunai.bilibili.record.map.controller.WsServerEndpointAdmin;
 import pro.niunai.bilibili.record.map.mapper.MapMapper;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.Msg;
@@ -31,7 +32,26 @@ public class MapHandleService {
 	@Autowired
 	MapMapper mapMapper;
 
-	public void sendMsg(Msg msg) {
+	public void sendMsg(Msg msg,MapVO map) {
+		WsServerEndpoint.map.forEach((k, v) -> {
+			try {
+				String jsonString = JSON.toJSONString(msg);
+				System.out.println("jsonString = " + jsonString);
+				v.getBasicRemote().sendText(jsonString);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		WsServerEndpointAdmin.map.forEach((k, v) -> {
+			try {
+				String jsonString = JSON.toJSONString(map);
+				System.out.println("jsonString = " + jsonString);
+				v.getBasicRemote().sendText(jsonString);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}	public void sendMsg(Msg msg) {
 		WsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(msg);
@@ -74,11 +94,17 @@ public class MapHandleService {
 				log.debug("数据库存入失败");
 			}
 			if (msg.getIsMap() == 1) {
-				sendMsg.setMsg("收到投图" + msg.getMap() + msg.getName());
-				sendMsg(sendMsg);
+				if (msg.getName() == null) {
+					sendMsg.setMsg("收到投图" + msg.getMap() +"未获取到图名");
+					sendMsg(sendMsg,msg);
+				} else {
+					sendMsg.setMsg("收到投图" + msg.getMap() + msg.getName());
+					sendMsg(sendMsg,msg);
+				}
+
 			} else {
 				sendMsg.setMsg("收到工匠号" + msg.getMap());
-				sendMsg(sendMsg);
+				sendMsg(sendMsg,msg);
 			}
 			return msg;
 		}
@@ -86,10 +112,10 @@ public class MapHandleService {
 		log.debug("解析地图信息为：{}", m);
 		if ("未玩".equals(mapVO.getStatus())) {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了,还没玩。");
-			sendMsg(sendMsg);
+			sendMsg(sendMsg,mapVO);
 		} else {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了。");
-			sendMsg(sendMsg);
+			sendMsg(sendMsg,mapVO);
 		}
 
 		return mapVO;
@@ -113,6 +139,21 @@ public class MapHandleService {
 			} catch (Exception e) {
 				log.error("地图信息解析错误");
 			}
+			if (mapInfo.getName()==null) {
+				mapInfo.setUserName(msg.getName());
+				mapInfo.setDanmu(msg.getMsg());
+				mapInfo.setCreateTime(LocalDateTime.now());
+				mapInfo.setMap(mapText);
+				MapVO mapVO = new MapVO();
+
+				BeanUtils.copyProperties(mapInfo, mapVO);
+
+				mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
+				mapVO.setIsMap(1);
+				mapVO.setStatus("未玩");
+				log.debug("未解析到地图信息：{}", mapVO);
+				return mapVO;
+			}
 			mapInfo.setUserName(msg.getName());
 			mapInfo.setDanmu(msg.getMsg());
 			mapInfo.setCreateTime(LocalDateTime.now());
@@ -122,6 +163,7 @@ public class MapHandleService {
 			BeanUtils.copyProperties(mapInfo, mapVO);
 
 			StringBuilder sbTagsName = new StringBuilder();
+
 			mapInfo.getTagsName().forEach(tag -> {
 				sbTagsName.append(",").append(tag);
 			});
