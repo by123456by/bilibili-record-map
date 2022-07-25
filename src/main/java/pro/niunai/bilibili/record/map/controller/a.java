@@ -26,6 +26,12 @@ public class a {
 
 	@RequestMapping("/map")
 	public MapVO map(Msg m) {
+		if (m.getMsg() == null) {
+			return null;
+		}
+		if (m.getName() == null) {
+			m.setName("乌冬面pp");
+		}
 		return mapHandleService.addMap(m);
 	}
 	@RequestMapping("/list")

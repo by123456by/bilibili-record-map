@@ -73,12 +73,7 @@ public class MapHandleService {
 			return null;
 		}
 		log.debug("收到投图信息：{}", m);
-		if (m.getName() == null) {
-			m.setName("乌冬面pp");
-		}
-		if (m.getMsg() == null) {
-			return null;
-		}
+
 		MapVO mapVO = mapMapper.selectByMap(mapText);
 		if (mapVO == null) {
 			log.debug("数据库未发现地图，准备存入数据库");
@@ -112,10 +107,10 @@ public class MapHandleService {
 		log.debug("解析地图信息为：{}", m);
 		if ("未玩".equals(mapVO.getStatus())) {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了,还没玩。");
-			sendMsg(sendMsg,mapVO);
+			sendMsg(sendMsg);
 		} else {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了。");
-			sendMsg(sendMsg,mapVO);
+			sendMsg(sendMsg);
 		}
 
 		return mapVO;
