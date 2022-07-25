@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>投图查看</title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/eui.css">
+</head>
+<body>
+<div id="app">
+    http://localhost:8080/danmu.html 此链接添加到直播姬进行展示
+    <table border="1">
+        <tr>
+            <th>投图人</th>
+            <th>图号</th>
+            <th>图名</th>
+            <th>简介</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        <tr v-for="p in arr">
+            <td>{{p.userName}}</td>
+            <td>{{p.map}}</td>
+            <td>{{p.name}}</td>
+            <td>{{p.description}}</td>
+            <td>{{p.status}}</td>
+            <td><a href="javascript:void(0)" @click="play(p.map)">玩过了</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- import JavaScript -->
+<script src="js/eui.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+    var v = new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    arr: []
+                }
+            },
+        created: function () {//此方法是Vue对象创建时执行的方法
+            //一般会把加载完页面请求数据的代码写在此方法中
+            axios.get("/list").then(function (response) {
+                v.arr = response.data;
+            })
+        },
+            methods: {
+                play(map) {
+                    axios.get("/play?map=" + map).then(function (response) {
+                        alert("标记完成！");
+                        location.reload();
+                    })
+                }
+            }
+        })
+</script>
+</body>
+</html>

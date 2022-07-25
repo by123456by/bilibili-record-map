@@ -18,9 +18,19 @@
                 #{clears}, #{attempts}, #{versusMatches}, #{plays}, #{clearRate}, #{coopMatches}, #{likes}, #{boos},
                 #{uniquePlayersAndVersus}, #{weeklyLikes}, #{weeklyPlays}, #{status}, #{isMap})
     </insert>
+    <update id="updateStatusByMap">
+        update map
+        set status=#{status}
+        where map = #{map}
+    </update>
     <select id="selectByMap" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
         select *
         from map
         where map = #{map}
+    </select>
+    <select id="selectlist" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
+        select *
+        from map
+        order by create_timestamp
     </select>
 </mapper>

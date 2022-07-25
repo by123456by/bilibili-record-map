@@ -7,11 +7,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
+import pro.niunai.bilibili.record.map.controller.WsServerEndpoint;
 import pro.niunai.bilibili.record.map.mapper.MapMapper;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 import pro.niunai.bilibili.record.map.pojo.MapVO;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -29,12 +31,28 @@ public class MapHandleService {
 	@Autowired
 	MapMapper mapMapper;
 
+	public void sendMsg(Msg msg) {
+		WsServerEndpoint.map.forEach((k, v) -> {
+			try {
+				String jsonString = JSON.toJSONString(msg);
+				System.out.println("jsonString = " + jsonString);
+				v.getBasicRemote().sendText(jsonString);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
 	public MapVO addMap(Msg m) {
 		String mapText = toMap(m.getMsg());
+		Msg sendMsg = new Msg();
+		sendMsg.setName(m.getName());
+		sendMsg.setMsg(m.getMsg());
 		if (mapText == null) {
+//			sendMsg(sendMsg);//展示弹幕 暂留
 			return null;
 		}
-		log.debug("收到投图信息：{}",m);
+		log.debug("收到投图信息：{}", m);
 		if (m.getName() == null) {
 			m.setName("乌冬面pp");
 		}
@@ -48,21 +66,40 @@ public class MapHandleService {
 			if (msg == null) {
 				return null;
 			}
-			log.debug("解析地图信息为：{}",m);
+			log.debug("解析地图信息为：{}", m);
 			int r = mapMapper.insert(msg);
 			if (r == 1) {
 				log.debug("数据库存入成功");
 			} else {
 				log.debug("数据库存入失败");
 			}
+			if (msg.getIsMap() == 1) {
+				sendMsg.setMsg("收到投图" + msg.getMap() + msg.getName());
+				sendMsg(sendMsg);
+			} else {
+				sendMsg.setMsg("收到工匠号" + msg.getMap());
+				sendMsg(sendMsg);
+			}
 			return msg;
 		}
 		log.debug("数据库发现地图");
-		log.debug("解析地图信息为：{}",m);
+		log.debug("解析地图信息为：{}", m);
+		if ("未玩".equals(mapVO.getStatus())) {
+			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了,还没玩。");
+			sendMsg(sendMsg);
+		} else {
+			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了。");
+			sendMsg(sendMsg);
+		}
+
 		return mapVO;
 	}
 
 	public MapVO msg(Msg msg) {
+		Msg sendMsg = new Msg();
+		sendMsg.setName(msg.getName());
+		sendMsg.setMsg(msg.getMsg());
+
 		String mapText = toMap(msg.getMsg());
 		if (mapText == null) {
 			return null;
@@ -97,14 +134,18 @@ public class MapHandleService {
 			mapVO.setTags(sbTags.substring(1));
 
 			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
-			mapVO.setCreateTimestamp((int) (System.currentTimeMillis()/1000));
+			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
 			mapVO.setIsMap(1);
 			mapVO.setStatus("未玩");
 			log.debug("解析地图信息：{}", mapVO);
 			return mapVO;
 		} else if (i == 1) {
+			sendMsg.setMsg("投图" + mapText + "失败，原因：格式错误");
+			sendMsg(sendMsg);
 			//格式错误
 		} else if (i == 2) {
+			sendMsg.setMsg("投图" + mapText + "失败，原因：验证错误");
+			sendMsg(sendMsg);
 			//验证错误
 		} else if (i == 3) {
 			//工匠号
@@ -119,7 +160,7 @@ public class MapHandleService {
 			BeanUtils.copyProperties(mapInfo, mapVO);
 
 			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
-			mapVO.setCreateTimestamp((int) (System.currentTimeMillis()/1000));
+			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
 			mapVO.setIsMap(0);
 			mapVO.setStatus("未玩");
 			log.debug("解析工匠信息：{}", mapVO);

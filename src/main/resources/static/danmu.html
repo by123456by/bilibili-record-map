@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>弹幕状态回显</title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/eui.css">
+</head>
+<body>
+<div id="app">
+    <span>{{name}}</span>
+    <span>{{m}}</span>
+    <span>{{msg}}</span>
+</div>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- import JavaScript -->
+<script src="js/eui.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+    var v = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                timer: '',
+                danmu: [],
+                name: "程序启动",
+                m:":",
+                msg: "正在初始化"
+            }
+        },
+        methods: {
+            add(){
+                if (v.danmu.length>0) {
+                let danmuMsg = v.danmu.splice(0,1);
+                v.name = danmuMsg[0].name;
+                v.msg = danmuMsg[0].msg;
+                    v.m = ":";
+                }else {
+                    v.name = "";
+                    v.msg ="";
+                    v.m = "";
+                }
+            }
+        },
+        mounted() {
+            this.timer = setInterval(this.add, 5000);
+        },
+        beforeDestroy() {
+            clearInterval(this.timer);
+        }
+    })
+</script>
+<script>
+    var ws = new WebSocket('ws://' + location.host + '/danmuWs');
+    // 连接成功时:
+    ws.addEventListener('open', function (event) {
+        console.log('websocket connected.');
+    });
+    // 收到消息时:
+    ws.addEventListener('message', function (event) {
+        console.log('message: ' + event.data);
+        var msgs = JSON.parse(event.data);
+        console.log(msgs);
+        v.danmu.push(msgs);
+        console.log(v.danmu);
+    });
+    // 连接关闭时:
+    ws.addEventListener('close', function () {
+        console.log('websocket closed.');
+        ws = new WebSocket('ws://' + location.host + '/danmuWs');
+    });
+    // 绑定到全局变量:
+    window.chatWs = ws;
+</script>
+</body>
+</html>

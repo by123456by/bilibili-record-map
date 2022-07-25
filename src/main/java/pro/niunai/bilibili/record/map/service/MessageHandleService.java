@@ -7,8 +7,10 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pro.niunai.bilibili.record.map.controller.WsServerEndpoint;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ public class MessageHandleService {
 	@Autowired
 	MapHandleService mapHandleService;
 
-//	private MapHandleService mapHandleService = new MapHandleService();
+	//	private MapHandleService mapHandleService = new MapHandleService();
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {

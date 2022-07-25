@@ -1,5 +1,7 @@
 package pro.niunai.bilibili.record.map.conf;
 
+import pro.niunai.bilibili.record.map.BilibiliRecordMapApplication;
+
 import java.io.*;
 import java.util.Properties;
 
@@ -13,8 +15,16 @@ public class ConfigProperties {
 
 	static {
 		properties = new Properties();
-		InputStream configInputStream = ConfigProperties.class
-				.getClassLoader().getResourceAsStream(profileName);
+//		InputStream configInputStream = ConfigProperties.class
+//				.getClassLoader().getResourceAsStream(profileName);
+		String filePath = BilibiliRecordMapApplication.getPath(profileName);
+		File file = new File(filePath);
+		FileInputStream configInputStream = null;
+		try {
+			configInputStream = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		try {
 			properties.load(configInputStream);

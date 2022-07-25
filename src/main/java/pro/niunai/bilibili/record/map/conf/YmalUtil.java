@@ -3,6 +3,7 @@ package pro.niunai.bilibili.record.map.conf;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+import pro.niunai.bilibili.record.map.BilibiliRecordMapApplication;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -23,7 +24,7 @@ public class YmalUtil {
 	}
 	static{
 		Yaml yml =null;
-		String filePath = YmalUtil.class.getResource("/application.yaml").getPath();
+		String filePath = BilibiliRecordMapApplication.getPath("application.yaml");
 		File file = new File(filePath);
 		try (FileInputStream in = new FileInputStream(file)){
 			yml = new Yaml();
@@ -35,7 +36,12 @@ public class YmalUtil {
 		Map<String,Object> spring =(Map)obj.get("spring");
 		Map<String,Object> datasource =(Map)spring.get("datasource");
 		String url = (String) datasource.get("url");
-		String dbPath = YmalUtil.class.getResource("/map.sqlite").getPath().substring(1);
+		String dbPath = BilibiliRecordMapApplication.getPath("map.sqlite");
+//		try {
+//			dbPath = YmalUtil.class.getClassLoader().getResource("./map.sqlite").toURI().toString().substring(6);
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
 		datasource.put("url", "jdbc:sqlite:"+dbPath);
 
 		try (FileWriter writer = new FileWriter(file)) {
