@@ -37,7 +37,9 @@ public class a {
 	@RequestMapping("/list")
 	public List<MapVO> list(Msg m) {
 		return mapMapper.selectlist();
-	}@RequestMapping("/play")
+	}
+
+	@RequestMapping("/play")
 	public void list(String map) {
 		mapMapper.updateStatusByMap(map, "玩过了");
 	}

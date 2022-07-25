@@ -32,7 +32,7 @@ public class MapHandleService {
 	@Autowired
 	MapMapper mapMapper;
 
-	public void sendMsg(Msg msg,MapVO map) {
+	public void sendMsg(Msg msg, MapVO map) {
 		WsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(msg);
@@ -51,7 +51,9 @@ public class MapHandleService {
 				e.printStackTrace();
 			}
 		});
-	}	public void sendMsg(Msg msg) {
+	}
+
+	public void sendMsg(Msg msg) {
 		WsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(msg);
@@ -90,16 +92,16 @@ public class MapHandleService {
 			}
 			if (msg.getIsMap() == 1) {
 				if (msg.getName() == null) {
-					sendMsg.setMsg("收到投图" + msg.getMap() +"未获取到图名");
-					sendMsg(sendMsg,msg);
+					sendMsg.setMsg("收到投图" + msg.getMap() + "未获取到图名");
+					sendMsg(sendMsg, msg);
 				} else {
 					sendMsg.setMsg("收到投图" + msg.getMap() + msg.getName());
-					sendMsg(sendMsg,msg);
+					sendMsg(sendMsg, msg);
 				}
 
 			} else {
 				sendMsg.setMsg("收到工匠号" + msg.getMap());
-				sendMsg(sendMsg,msg);
+				sendMsg(sendMsg, msg);
 			}
 			return msg;
 		}
@@ -107,6 +109,9 @@ public class MapHandleService {
 		log.debug("解析地图信息为：{}", m);
 		if ("未玩".equals(mapVO.getStatus())) {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了,还没玩。");
+			sendMsg(sendMsg);
+		} else if ("玩过了".equals(mapVO.getStatus())) {
+			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：玩过了。");
 			sendMsg(sendMsg);
 		} else {
 			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了。");
@@ -134,7 +139,7 @@ public class MapHandleService {
 			} catch (Exception e) {
 				log.error("地图信息解析错误");
 			}
-			if (mapInfo.getName()==null) {
+			if (mapInfo.getName() == null) {
 				mapInfo.setUserName(msg.getName());
 				mapInfo.setDanmu(msg.getMsg());
 				mapInfo.setCreateTime(LocalDateTime.now());
