@@ -1,6 +1,8 @@
 package pro.niunai.bilibili.record.map.pojo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,83 +12,84 @@ import java.util.List;
  * @date: 2022/7/23 8:50
  */
 @Data
+@ApiModel(value="地图信息VO")
 public class MapVO {
-	//投图人名
+	@ApiModelProperty(value="投图人名",example="乌冬面pp")
 	private String userName;
-	//原始弹幕
+	@ApiModelProperty(value="原始弹幕",example="SQG-9NT-9GF")
 	private String danmu;
-	//图号
+	@ApiModelProperty(value="图号",example="SQG9NT9GF")
 	private String map;
-	//投图时间
+	@ApiModelProperty(value="投图时间时间戳",example="1659194286",notes="十位")
 	private Integer createTimestamp;
-	//当前状态
+	@ApiModelProperty(value="当前状态",example="未玩",notes = "当前以文本形式存储，未来可能改为数值代码")
 	private String status;
-	//是否为图号
+	@ApiModelProperty(value="是否为图号",example="1",notes = "0为工匠号，1为图号")
 	private Integer isMap;
-	//图名
+	@ApiModelProperty(value="图名",example="方舟³ ~ Ark³  (CHN精英入队图)")
 	private String name;
-	//地图简介
+	@ApiModelProperty(value="地图简介",example="100sec Speedrun")
 	private String description;
-	//上传时间文本 格式为：15-5-2022 7:34:27
+	@ApiModelProperty(value="上传时间",example="10-7-2020 1:10:42")
 	private String uploadedPretty;
-	//上传时间时间戳 十位
+	@ApiModelProperty(value="上传时间时间戳",example="1594343442",notes="十位")
 	private Integer uploaded;
-	//真实地图编号
+	@ApiModelProperty(value="真实地图编号",example="21741537")
 	private Integer dataId;
-	//图号（冗余）
+	@ApiModelProperty(value="图号",example="SQG9NT9GF",notes="云端返回(冗余)")
 	private String courseId;
-	//游戏风格 文本简写 例如 SMB3 （初步分析 超级马里奥三代）
+	@ApiModelProperty(value="游戏风格",example="SMB1")
 	private String gameStyleName;
-	//游戏风格编号
+	@ApiModelProperty(value="游戏风格编号",example="0")
 	private Integer gameStyle;
-	//游戏主题 文本 例如 Castle （直译 城堡）
+	@ApiModelProperty(value="游戏主题",example="Castle")
 	private String themeName;
-	//游戏主题编号
+	@ApiModelProperty(value="游戏主题编号",example="2")
 	private Integer theme;
-	//游戏难度 文本 例如 Super expert （大概是 极难）
+	@ApiModelProperty(value="游戏难度",example="Super expert")
 	private String difficultyName;
-	//游戏难度编号
+	@ApiModelProperty(value="游戏难度编号",example="3")
 	private Integer difficulty;
-	//游戏标签 多个按|分割
+	@ApiModelProperty(value="游戏标签",example="Speedrun|Short and sweet",notes="多个按|分割")
 	private String tagsName;
-	//游戏标签编号 多个按|分割
+	@ApiModelProperty(value="游戏标签",example="3|6",notes="多个按|分割")
 	private String tags;
-	//最速通关时间 文本 例如 01:01.948
+	@ApiModelProperty(value="最速通关时间文本",example="01:39.940")
 	private String worldRecordPretty;
-	//最速通关时间 毫秒数
+	@ApiModelProperty(value="最速通关时间毫秒数",example="99940")
 	private Integer worldRecord;
-	//上传者通关时间 文本
+	@ApiModelProperty(value="上传者通关时间文本",example="01:39.983")
 	private String uploadTimePretty;
-	//上传者通关时间 毫秒数
+	@ApiModelProperty(value="上传者通关时间毫秒数",example="99983")
 	private Integer uploadTime;
-	//评论数
+	@ApiModelProperty(value="评论数",example="20")
 	private Integer numComments;
-	//通关条件编号 0为无条件 文本存储
+	@ApiModelProperty(value="通关条件编号",example="4116396131",notes = "0为无条件,字符串")
 	private String clearConditionText;
-	//通关条件 文本 无条件为null
+	@ApiModelProperty(value="通关条件",example="Reach the goal after grabbing at least/all (n) Coin(s).",notes="无条件为null")
 	private String clearConditionName;
-	//通关条件数量 比如需要100金币 为100
+	@ApiModelProperty(value="通关条件数量",example="100")
 	private Integer clearConditionMagnitude;
-	//通关数
+	@ApiModelProperty(value="通关数",example="9")
 	private Integer clears;
-	//已通关的尝试数
+	@ApiModelProperty(value="游玩数",example="72213",notes = "游玩数或者已通关的人的游玩数，大概。")
 	private Integer attempts;
-	//通关率
+	@ApiModelProperty(value="通关率",example="0.01%")
 	private String clearRate;
-	//游玩人数
+	@ApiModelProperty(value="游玩人数",example="2339")
 	private Integer plays;
-	//多人对战游玩数？
+	@ApiModelProperty(value="多人对战游玩数",example="0",notes ="不确定")
 	private Integer versusMatches;
-	//多人合作游玩数？
+	@ApiModelProperty(value="多人合作游玩数",example="99",notes ="不确定")
 	private Integer coopMatches;
-	//点赞数
+	@ApiModelProperty(value="点赞数",example="1")
 	private Integer likes;
-	//点踩数
+	@ApiModelProperty(value="点踩数",example="19")
 	private Integer boos;
-	//游玩数
+	@ApiModelProperty(value="独特的玩家与对战",example="823",notes ="不知道是什么")
 	private Integer uniquePlayersAndVersus;
-	//本周点赞数
+	@ApiModelProperty(value="本周点赞数",example="0")
 	private Integer weeklyLikes;
-	//本周游玩数
+	@ApiModelProperty(value="本周游玩数",example="6")
 	private Integer weeklyPlays;
 }

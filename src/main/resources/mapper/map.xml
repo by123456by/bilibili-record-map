@@ -33,4 +33,10 @@
         from map
         order by create_timestamp
     </select>
+    <select id="selectMapByNew" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
+        select *
+        from map
+        order by create_timestamp
+        limit 1
+    </select>
 </mapper>

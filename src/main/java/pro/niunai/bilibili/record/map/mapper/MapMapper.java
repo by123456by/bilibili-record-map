@@ -19,4 +19,6 @@ public interface  MapMapper {
 	MapVO selectByMap(String map);
 	//查询全部
 	List<MapVO> selectlist();
+	//获取最新一条的投图信息
+	MapVO selectMapByNew();
 }

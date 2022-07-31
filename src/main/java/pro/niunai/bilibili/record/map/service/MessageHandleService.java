@@ -1,21 +1,17 @@
 package pro.niunai.bilibili.record.map.service;
 
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pro.niunai.bilibili.record.map.controller.WsServerEndpoint;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -34,10 +30,11 @@ public class MessageHandleService {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {
 //            System.out.println(s1);
-//			log.debug("消息为：{}", s1);
+//			log.trace("消息为：{}", s1);
 			if (s1.contains("cmd")) {
 				JSONObject json = JSON.parseObject(s1);
 				if ("DANMU_MSG".equals(json.getString("cmd"))) {
+//					log.trace("消息为：{}", s1);`
 					JSONArray info = json.getJSONArray("info");
 					String msg = info.getString(1);
 					JSONArray userJson = info.getJSONArray(2);
@@ -47,10 +44,6 @@ public class MessageHandleService {
 					m.setName(name);
 					m.setMsg(msg);
 					mapHandleService.addMap(m);
-//					HashMap<String, Object> paramMap = new HashMap<>();
-//					paramMap.put("msg", msg);
-//					paramMap.put("name", name);
-//					HttpUtil.post("http://localhost:8080",paramMap);
 				}
 			}
 

@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import pro.niunai.bilibili.record.map.controller.WsServerEndpoint;
-import pro.niunai.bilibili.record.map.controller.WsServerEndpointAdmin;
+import pro.niunai.bilibili.record.map.controller.DanmuWsServerEndpoint;
+import pro.niunai.bilibili.record.map.controller.AdminWsServerEndpoint;
 import pro.niunai.bilibili.record.map.mapper.MapMapper;
 import pro.niunai.bilibili.record.map.pojo.MapInfo;
 import pro.niunai.bilibili.record.map.pojo.Msg;
@@ -33,7 +32,7 @@ public class MapHandleService {
 	MapMapper mapMapper;
 
 	public void sendMsg(Msg msg, MapVO map) {
-		WsServerEndpoint.map.forEach((k, v) -> {
+		DanmuWsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(msg);
 				System.out.println("jsonString = " + jsonString);
@@ -42,7 +41,7 @@ public class MapHandleService {
 				e.printStackTrace();
 			}
 		});
-		WsServerEndpointAdmin.map.forEach((k, v) -> {
+		AdminWsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(map);
 				System.out.println("jsonString = " + jsonString);
@@ -54,7 +53,7 @@ public class MapHandleService {
 	}
 
 	public void sendMsg(Msg msg) {
-		WsServerEndpoint.map.forEach((k, v) -> {
+		DanmuWsServerEndpoint.map.forEach((k, v) -> {
 			try {
 				String jsonString = JSON.toJSONString(msg);
 				System.out.println("jsonString = " + jsonString);
