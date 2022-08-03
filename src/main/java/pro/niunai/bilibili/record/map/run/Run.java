@@ -24,6 +24,8 @@ public class Run implements ApplicationRunner {
 	MakeClientService makeClientService;
 	//0123456789BCDFGHJKLMNPQRSTVWXY-
 	//https://tgrcode.com/mm2/level_info/NBR49DCMF
+	//https://tgrcode.com/mm2/level_thumbnail/NBR49DCMF
+	//https://tgrcode.com/mm2/level_entire_thumbnail/NBR49DCMF
 	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("当前房间号为：" + ConfigProperties.getProperty("roomId"));
