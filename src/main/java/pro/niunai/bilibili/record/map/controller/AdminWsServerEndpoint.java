@@ -25,7 +25,7 @@ public class AdminWsServerEndpoint {
 	 */
 	@OnOpen
 	public void onOpen(Session session) {
-		System.out.println("连接成功");
+		System.out.println("后台查看连接成功");
 		map.put(session.getId(), session);
 
 	}
@@ -36,7 +36,7 @@ public class AdminWsServerEndpoint {
 	 */
 	@OnClose
 	public void onClose(Session session) {
-		System.out.println("连接关闭");
+		System.out.println("后台查看连接关闭");
 		map.remove(session.getId());
 	}
 
@@ -46,7 +46,7 @@ public class AdminWsServerEndpoint {
 	 */
 	@OnMessage
 	public String onMsg(String text) throws IOException {
-		return "servet 发送：" + text;
+		return "servet 后台查看发送：" + text;
 	}
 
 	/**

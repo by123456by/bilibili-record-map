@@ -4,7 +4,7 @@ package pro.niunai.bilibili.record.map.pojo;
  * 错误代码枚举类型
  */
 public enum ResponseCode {
-
+    CONTINUE(100),
     OK(200),
     BAD_REQUEST(400),
     FORBIDDEN(403),
