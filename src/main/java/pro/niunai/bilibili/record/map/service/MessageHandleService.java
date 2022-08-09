@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pro.niunai.bilibili.record.map.controller.MapController;
+import pro.niunai.bilibili.record.map.pojo.Danmu;
 import pro.niunai.bilibili.record.map.pojo.Msg;
 
 import java.nio.ByteBuffer;
@@ -17,13 +19,14 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
+ * 消息解析
  * @author 本間Saki
  */
 @Slf4j
 @Component
 public class MessageHandleService {
 	@Autowired
-	MapHandleService mapHandleService;
+	MapController mapController;
 
 	//	private MapHandleService mapHandleService = new MapHandleService();
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
@@ -40,10 +43,10 @@ public class MessageHandleService {
 					JSONArray userJson = info.getJSONArray(2);
 					String name = userJson.getString(1);
 					log.debug("收到用户:【{}】发送到弹幕:【{}】", name, msg);
-					Msg m = new Msg();
+					Danmu m = new Danmu();
 					m.setName(name);
 					m.setMsg(msg);
-					mapHandleService.addMap(m);
+					mapController.addMap(m);
 				}
 			}
 

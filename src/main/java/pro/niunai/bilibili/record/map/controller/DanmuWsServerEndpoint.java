@@ -52,7 +52,7 @@ public class DanmuWsServerEndpoint {
 	 * 广播发送消息
 	 * @param text
 	 */
-	public void sendMessage(String text) {
+	public static void sendMessage(String text) {
 		map.forEach((k, v) -> {
 			try {
 				v.getBasicRemote().sendText(text);

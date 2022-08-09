@@ -9,9 +9,7 @@ import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.controller.AdminWsServerEndpoint;
 import pro.niunai.bilibili.record.map.controller.DanmuWsServerEndpoint;
 import pro.niunai.bilibili.record.map.mapper.MapMapper;
-import pro.niunai.bilibili.record.map.pojo.MapInfo;
-import pro.niunai.bilibili.record.map.pojo.Msg;
-import pro.niunai.bilibili.record.map.pojo.MapVO;
+import pro.niunai.bilibili.record.map.pojo.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,7 +17,12 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static pro.niunai.bilibili.record.map.pojo.ResponseCode.*;
+import static pro.niunai.bilibili.record.map.pojo.Status.*;
+
 /**
+ * 处理弹幕
+ *
  * @date: 2022/7/21 10:28
  */
 @Component
@@ -31,184 +34,111 @@ public class MapHandleService {
 	@Autowired
 	MapMapper mapMapper;
 
-	public void sendMsg(Msg msg, MapVO map) {
-		DanmuWsServerEndpoint.map.forEach((k, v) -> {
-			try {
-				String jsonString = JSON.toJSONString(msg);
-				System.out.println("jsonString = " + jsonString);
-				v.getBasicRemote().sendText(jsonString);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-		AdminWsServerEndpoint.map.forEach((k, v) -> {
-			try {
-				String jsonString = JSON.toJSONString(map);
-				System.out.println("jsonString = " + jsonString);
-				v.getBasicRemote().sendText(jsonString);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
+	/**
+	 * 发送投图结果到前端
+	 * @param jsonResult
+	 */
+	public void sendMsg( JsonResult jsonResult) {
+		String jsonString = JSON.toJSONString(jsonResult);
+		AdminWsServerEndpoint.sendMessage(jsonString);
+		DanmuWsServerEndpoint.sendMessage(jsonString);
 	}
 
-	public void sendMsg(Msg msg) {
-		DanmuWsServerEndpoint.map.forEach((k, v) -> {
-			try {
-				String jsonString = JSON.toJSONString(msg);
-				System.out.println("jsonString = " + jsonString);
-				v.getBasicRemote().sendText(jsonString);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-	}
 
-	public MapVO addMap(Msg m) {
-		String mapText = toMap(m.getMsg());
-		Msg sendMsg = new Msg();
-		sendMsg.setName(m.getName());
-		sendMsg.setMsg(m.getMsg());
-		if (mapText == null) {
-//			sendMsg(sendMsg);//展示弹幕 暂留
-			return null;
-		}
-		log.debug("收到投图信息：{}", m);
-
+	/**
+	 * 将地图信息存储到数据库
+	 * @param map 地图信息
+	 */
+	public JsonResult addMap(MapVO map) {
+		String mapText = map.getMap();
+		log.debug("准备添加投图：{}", mapText);
 		MapVO mapVO = mapMapper.selectByMap(mapText);
 		if (mapVO == null) {
 			log.debug("数据库未发现地图，准备存入数据库");
-			MapVO msg = msg(m);
-			if (msg == null) {
-				return null;
-			}
-			log.debug("解析地图信息为：{}", m);
-			int r = mapMapper.insert(msg);
+			int r = mapMapper.insert(map);
 			if (r == 1) {
 				log.debug("数据库存入成功");
 			} else {
 				log.debug("数据库存入失败");
 			}
-			if (msg.getIsMap() == 1) {
-				if (msg.getName() == null) {
-					sendMsg.setMsg("收到投图" + msg.getMap() + "未获取到图名");
-					sendMsg(sendMsg, msg);
-				} else {
-					sendMsg.setMsg("收到投图" + msg.getMap() + msg.getName());
-					sendMsg(sendMsg, msg);
-				}
-
-			} else {
-				sendMsg.setMsg("收到工匠号" + msg.getMap());
-				sendMsg(sendMsg, msg);
-			}
-			return msg;
+			return JsonResult.ok(map);
 		}
 		log.debug("数据库发现地图");
-		log.debug("解析地图信息为：{}", m);
-		if ("未玩".equals(mapVO.getStatus())) {
-			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了,还没玩。");
-			sendMsg(sendMsg);
-		} else if ("玩过了".equals(mapVO.getStatus())) {
-			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：玩过了。");
-			sendMsg(sendMsg);
-		} else {
-			sendMsg.setMsg("投图" + mapVO.getMap() + "失败，原因：投过了。");
-			sendMsg(sendMsg);
+		if (NOPLAY.equals(mapVO.getStatus())) {
+			return JsonResult.failed(DUPLICATE_MAP_NOPLAY, "投过了,还没玩。");
+		} else if (PLAYED.equals(mapVO.getStatus())) {
+			return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了,玩过了。");
 		}
+		return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了。");
 
-		return mapVO;
 	}
 
-	public MapVO msg(Msg msg) {
-		Msg sendMsg = new Msg();
-		sendMsg.setName(msg.getName());
-		sendMsg.setMsg(msg.getMsg());
-
-		String mapText = toMap(msg.getMsg());
-		if (mapText == null) {
-			return null;
+	/**
+	 * 将弹幕消息中包含的图号解析成地图信息
+	 *
+	 * @param dm 弹幕消息
+	 */
+	public JsonResult map(Danmu dm) {
+		JsonResult ResultMap = toMap(dm.getMsg());
+		if (ResultMap.getState() != 200) {
+			return ResultMap;
 		}
-		int i = verifyMap(mapText);
-		if (i == 0) {
-			//图号正确
-			MapInfo mapInfo = new MapInfo();
-			try {
-				mapInfo = getMapInfo(mapText);
-			} catch (Exception e) {
-				log.error("地图信息解析错误");
-			}
-			if (mapInfo.getName() == null) {
-				mapInfo.setUserName(msg.getName());
-				mapInfo.setDanmu(msg.getMsg());
-				mapInfo.setCreateTime(LocalDateTime.now());
-				mapInfo.setMap(mapText);
-				MapVO mapVO = new MapVO();
-
-				BeanUtils.copyProperties(mapInfo, mapVO);
-
-				mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
-				mapVO.setIsMap(1);
-				mapVO.setStatus("未玩");
-				log.debug("未解析到地图信息：{}", mapVO);
-				return mapVO;
-			}
-			mapInfo.setUserName(msg.getName());
-			mapInfo.setDanmu(msg.getMsg());
-			mapInfo.setCreateTime(LocalDateTime.now());
-			mapInfo.setMap(mapText);
-
+		String mapText = (String) ResultMap.getData();
+		int isMap = verifyMap(mapText);
+		if (isMap == 3) {
+			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工艺号");
+		} else if (isMap == 2) {
+			return JsonResult.failed(NOT_MAP_VALIDATION_ERROR, "图号验证错误");
+		} else if (isMap == 1) {
+			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号验证错误");
+		}
+		MapInfo mapInfo = new MapInfo();
+		try {
+			mapInfo = getMapInfo(mapText);
+		} catch (Exception e) {
+			log.error("地图信息解析错误");
 			MapVO mapVO = new MapVO();
+
 			BeanUtils.copyProperties(mapInfo, mapVO);
 
-			StringBuilder sbTagsName = new StringBuilder();
-
-			mapInfo.getTagsName().forEach(tag -> {
-				sbTagsName.append(",").append(tag);
-			});
-			mapVO.setTagsName(sbTagsName.substring(1));
-
-			StringBuilder sbTags = new StringBuilder();
-			mapInfo.getTags().forEach(tag -> {
-				sbTags.append(",").append(tag);
-			});
-			mapVO.setTags(sbTags.substring(1));
-
-			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
+			mapVO.setUserName(dm.getName());
+			mapVO.setDanmu(dm.getMsg());
+			mapVO.setMap(mapText);
 			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
 			mapVO.setIsMap(1);
-			mapVO.setStatus("未玩");
-			log.debug("解析地图信息：{}", mapVO);
-			return mapVO;
-		} else if (i == 1) {
-			sendMsg.setMsg("投图" + mapText + "失败，原因：格式错误");
-			sendMsg(sendMsg);
-			//格式错误
-		} else if (i == 2) {
-			sendMsg.setMsg("投图" + mapText + "失败，原因：验证错误");
-			sendMsg(sendMsg);
-			//验证错误
-		} else if (i == 3) {
-			//工匠号
-			MapInfo mapInfo = new MapInfo();
+			mapVO.setStatus(NOPLAY);
+			log.debug("解析到地图信息：{}", mapVO);
 
-			mapInfo.setUserName(msg.getName());
-			mapInfo.setDanmu(msg.getMsg());
-			mapInfo.setCreateTime(LocalDateTime.now());
-			mapInfo.setMap(mapText);
-
-			MapVO mapVO = new MapVO();
-			BeanUtils.copyProperties(mapInfo, mapVO);
-
-			mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
-			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
-			mapVO.setIsMap(0);
-			mapVO.setStatus("未玩");
-			log.debug("解析工匠信息：{}", mapVO);
-			return mapVO;
+			return JsonResult.ok(mapVO);
 		}
 
-		return null;
+		MapVO mapVO = new MapVO();
+		BeanUtils.copyProperties(mapInfo, mapVO);
+
+		StringBuilder sbTagsName = new StringBuilder();
+
+		mapInfo.getTagsName().forEach(tag -> {
+			sbTagsName.append(",").append(tag);
+		});
+		mapVO.setTagsName(sbTagsName.substring(1));
+
+		StringBuilder sbTags = new StringBuilder();
+		mapInfo.getTags().forEach(tag -> {
+			sbTags.append(",").append(tag);
+		});
+		mapVO.setTags(sbTags.substring(1));
+
+		mapVO.setUserName(dm.getName());
+		mapVO.setDanmu(dm.getMsg());
+		mapVO.setMap(mapText);
+
+		mapVO.setClearConditionText(mapInfo.getClearCondition().toString());
+		mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
+		mapVO.setIsMap(1);
+		mapVO.setStatus(NOPLAY);
+		log.debug("解析地图信息：{}", mapVO);
+		return JsonResult.ok(mapVO);
+
 	}
 
 	/**
@@ -217,10 +147,9 @@ public class MapHandleService {
 	 * @param text 消息
 	 * @return 预处理后的图号
 	 */
-	public String toMap(String text) {
-		text = text.replaceAll("\\s*", "");
-		text = text.replaceAll("-", "");
-		text = text.replaceAll("_", "");
+	public JsonResult toMap(String text) {
+		text = text.replaceAll("\\s", "");
+		text = text.replaceAll("\\p{Punct}", "");
 		text = text.toUpperCase(Locale.ROOT);
 		String reg = "[A-Z0-9]{9}";
 		Pattern p = Pattern.compile(reg);
@@ -228,9 +157,9 @@ public class MapHandleService {
 		if (m.find()) {
 			String group = m.group(0);
 			log.debug("识别到图号：{}", group);
-			return group;
+			return JsonResult.ok(group);
 		}
-		return null;
+		return JsonResult.failed(NOT_MAP, "不包含图号");
 	}
 
 	/**

@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * 建立连接
  * @author 本間Saki
  */
 @Slf4j

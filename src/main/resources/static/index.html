@@ -44,7 +44,7 @@
             },
         created: function () {//此方法是Vue对象创建时执行的方法
             //一般会把加载完页面请求数据的代码写在此方法中
-            axios.get("/list").then(function (response) {
+            axios.get("/list_noplay").then(function (response) {
                 v.arr = response.data;
             })
         },
@@ -67,10 +67,12 @@
     // 收到消息时:
     ws.addEventListener('message', function (event) {
         console.log('message: ' + event.data);
-        var msgs = JSON.parse(event.data);
+        if (event.data.state==200) {
+        var msgs = JSON.parse(event.data.data);
         console.log(msgs);
         v.arr.push(msgs);
         console.log(v.arr);
+        }
     });
     // 连接关闭时:
     ws.addEventListener('close', function () {

@@ -25,20 +25,23 @@
                 timer: '',
                 danmu: [],
                 name: "程序启动",
-                m:":",
+                m: ":",
                 msg: "正在初始化"
             }
         },
         methods: {
-            add(){
-                if (v.danmu.length>0) {
-                let danmuMsg = v.danmu.splice(0,1);
-                v.name = danmuMsg[0].name;
-                v.msg = danmuMsg[0].msg;
-                    v.m = ":";
-                }else {
+            add() {
+                if (v.danmu.length > 0) {
+                    let danmuMsg = v.danmu.splice(0, 1);
+                    v.name = v.data.userName;
+                    if (v.state != 200) {
+                        v.msg = "投图失败，原因：" + v.message;
+                    } else {
+                        v.msg = "收到投图:" + v.data.name;
+                    }
+                } else {
                     v.name = "";
-                    v.msg ="";
+                    v.msg = "";
                     v.m = "";
                 }
             }

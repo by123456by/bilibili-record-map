@@ -18,7 +18,9 @@ public interface  MapMapper {
 	//根据图号查数据
 	MapVO selectByMap(String map);
 	//查询全部
-	List<MapVO> selectlist();
+	List<MapVO> selectList();
+	//查询未玩全部
+	List<MapVO> selectListByNoPlay();
 	//获取最新一条的投图信息
 	MapVO selectMapByNew();
 }

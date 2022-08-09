@@ -28,7 +28,7 @@
         from map
         where map = #{map}
     </select>
-    <select id="selectlist" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
+    <select id="selectList" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
         select *
         from map
         order by create_timestamp
@@ -38,5 +38,11 @@
         from map
         order by create_timestamp
         limit 1
+    </select>
+    <select id="selectListByNoPlay" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
+        select *
+        from map
+        where status='未玩'
+        order by create_timestamp
     </select>
 </mapper>
