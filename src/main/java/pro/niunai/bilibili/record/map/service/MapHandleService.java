@@ -65,11 +65,11 @@ public class MapHandleService {
 		}
 		log.debug("数据库发现地图");
 		if (NOPLAY.equals(mapVO.getStatus())) {
-			return JsonResult.failed(DUPLICATE_MAP_NOPLAY, "投过了,还没玩。");
+			return JsonResult.failed(DUPLICATE_MAP_NOPLAY, "投过了,还没玩。",map);
 		} else if (PLAYED.equals(mapVO.getStatus())) {
-			return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了,玩过了。");
+			return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了,玩过了。",map);
 		}
-		return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了。");
+		return JsonResult.failed(DUPLICATE_MAP_PLAY, "投过了。",map);
 
 	}
 
@@ -86,11 +86,20 @@ public class MapHandleService {
 		String mapText = (String) ResultMap.getData();
 		int isMap = verifyMap(mapText);
 		if (isMap == 3) {
-			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工艺号");
+			MapVO mapVO = new MapVO();
+			mapVO.setUserName(dm.getName());
+			mapVO.setDanmu(dm.getMsg());
+			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工艺号",mapVO);
 		} else if (isMap == 2) {
-			return JsonResult.failed(NOT_MAP_VALIDATION_ERROR, "图号验证错误");
+			MapVO mapVO = new MapVO();
+			mapVO.setUserName(dm.getName());
+			mapVO.setDanmu(dm.getMsg());
+			return JsonResult.failed(NOT_MAP_VALIDATION_ERROR, "图号验证错误",mapVO);
 		} else if (isMap == 1) {
-			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号验证错误");
+			MapVO mapVO = new MapVO();
+			mapVO.setUserName(dm.getName());
+			mapVO.setDanmu(dm.getMsg());
+			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号验证错误",mapVO);
 		}
 		MapInfo mapInfo = new MapInfo();
 		try {

@@ -5,9 +5,29 @@
     <title>弹幕状态回显</title>
     <!-- import CSS -->
     <link rel="stylesheet" href="css/eui.css">
+    <style>
+        @font-face {
+            font-family: "100";
+            src: url("css/fonts/100.TTF") ;
+        }
+
+        body {
+            font-size: 40px;
+            font-family: "100",serif;
+            background-color: rgba(0, 0, 0, 0);
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        #app {
+            line-height: 80px;
+            background-color: #8c939d;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
+<div id="app" >
+
     <span>{{name}}</span>
     <span>{{m}}</span>
     <span>{{msg}}</span>
@@ -32,13 +52,14 @@
         methods: {
             add() {
                 if (v.danmu.length > 0) {
-                    let danmuMsg = v.danmu.splice(0, 1);
+                    let danmuMsg = v.danmu.splice(0, 1)[0];
+                    console.log(danmuMsg)
                     v.name = danmuMsg.data.userName;
-                    if (v.state == 100) {
+                    if (danmuMsg.state == 100) {
                         v.msg = danmuMsg.message;
-                    }else if (v.state != 200) {
+                    } else if (danmuMsg.state != 200) {
                         v.msg = "投图失败，原因：" + danmuMsg.message;
-                    } else if(v.state == 200){
+                    } else if (danmuMsg.state == 200) {
                         v.msg = "收到投图:" + danmuMsg.data.name;
                     }
                 } else {

@@ -27,7 +27,7 @@ import static pro.niunai.bilibili.record.map.pojo.Status.*;
  */
 @RestController
 @Slf4j
-@Api(tags="后台api")
+@Api(tags = "后台api")
 public class MapController {
 	@Autowired
 	MapMapper mapMapper;
@@ -44,14 +44,16 @@ public class MapController {
 	@PostMapping("/add-map")
 	public JsonResult addMap(Danmu dm) {
 		if (dm.getMsg() == null) {
-			return JsonResult.failed(BAD_REQUEST,"没有弹幕信息");
+			return JsonResult.failed(BAD_REQUEST, "没有弹幕信息");
 		}
 		if (dm.getName() == null) {
-			return JsonResult.failed(BAD_REQUEST,"没有投图人信息");
+			return JsonResult.failed(BAD_REQUEST, "没有投图人信息");
 		}
 
 		JsonResult map = mapHandleService.map(dm);
-		if (map.getState()!=200) {
+		if (map.getState() == 440) {
+			return map;
+		} else if (map.getState() != 200) {
 			mapHandleService.sendMsg(map);
 			return map;
 		}
@@ -68,12 +70,12 @@ public class MapController {
 	})
 	@GetMapping("/list")
 	public JsonPage<MapVO> list(Integer page, Integer pageSize) {
-		PageHelper.startPage(page,pageSize);
+		PageHelper.startPage(page, pageSize);
 		List<MapVO> mapVOS = mapMapper.selectList();
 		return JsonPage.restPage(new PageInfo<>(mapVOS));
 	}
 
-@ApiOperation("获取全部未玩列表")
+	@ApiOperation("获取全部未玩列表")
 	@GetMapping("/list_noplay")
 	public List<MapVO> list_nopay() {
 		return mapMapper.selectListByNoPlay();
@@ -81,7 +83,7 @@ public class MapController {
 
 	@ApiOperation("修改投图状态")
 	@GetMapping("/play")
-	public void list(String map,String status) {
+	public void list(String map, String status) {
 		if (status == null) {
 			status = PLAYED;
 		}
