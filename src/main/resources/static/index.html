@@ -5,29 +5,136 @@
     <title>投图查看</title>
     <!-- import CSS -->
     <link rel="stylesheet" href="css/eui.css">
+    <style>
+        @font-face {
+            font-family: "100";
+            src: url("css/fonts/100.TTF") ;
+        }
+
+        body {
+            background-color: rgb(212, 207, 196);
+            font-family: "100";
+            margin: 0 auto;
+        }
+
+        #input {
+            position: absolute;
+            top: -10000px;
+            opacity: 0;
+            z-inde: -10;
+        }
+
+        .map {
+            background-color: rgb(255, 253, 239);
+            border-radius: 25px;
+            margin: 10px auto;
+            width: 600px;
+            font-size: 18px;
+            color: rgb(95, 28, 28);
+            overflow: hidden;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <div id="app">
-    http://localhost:8080/danmu.html 此链接添加到直播姬进行展示
-    <table border="1">
-        <tr>
-            <th>投图人</th>
-            <th>图号</th>
-            <th>图名</th>
-            <th>简介</th>
-            <th>状态</th>
-            <th>操作</th>
-        </tr>
-        <tr v-for="p in arr">
-            <td>{{p.userName}}</td>
-            <td>{{p.map}}</td>
-            <td>{{p.name}}</td>
-            <td>{{p.description}}</td>
-            <td>{{p.status}}</td>
-            <td><a href="javascript:void(0)" @click="play(p.map)">玩过了</a>
-            </td>
-        </tr>
-    </table>
+    <div style="margin: 0 auto;width: 600px">
+        <a id="text">http://localhost:8080/danmu.html</a>
+        <input id="input">
+        <el-button size="mini" type="primary" onclick="copyText()">复制</el-button>
+        此链接添加到直播姬进行展示
+    </div>
+    <div style="margin: 0 auto;width: 300px;">
+        <el-input style="width: 200px" v-model="input" placeholder="图号"></el-input>
+        <el-button @click="add()" type="primary">投图</el-button>
+    </div>
+    <div>
+        <div class="map" v-for="p in arr">
+            <div style="margin-bottom: 7px">
+                <span style="color: #66b1ff">{{p.gameStyleName}}</span>
+                <span style="color: #5daf34">{{p.themeName}}</span>
+                <span>{{p.name}}</span>
+            </div>
+            <div style="height: 130px">
+                <span style="float:left">
+                    <el-image
+                            lazy
+                            style="height: 120px"
+                            :src="'https://tgrcode.lifan.one/mm2/level_thumbnail/'+p.map"
+                            :preview-src-list="['https://tgrcode.lifan.one/mm2/level_entire_thumbnail/'+p.map]">
+                    </el-image>
+                </span>
+                <span style="float:left;margin-left: 10px">
+                    点赞:{{p.likes}} 点踩:{{p.boos}}
+                    <br>
+                    标签:{{p.tagsName}}
+                    <br>
+                    上传时间:{{p.uploadedPretty}}
+                    <br>
+                    作者通关时间:{{p.uploadTimePretty}}
+                    <br>
+                    难度:{{p.difficulty}}-{{p.difficultyName}}
+                </span>
+            </div>
+            <div style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px">
+                地图简介:{{p.description}} <br>
+                投图弹幕:{{p.danmu}}
+            </div>
+            <div style="margin-bottom: 7px">
+                <el-row :gutter="20">
+                    <el-col :span="8">
+                        <div style="background-color: rgb(255,243,213);border-radius: 25px;">
+                            最快通关时间 <br>
+                            {{p.worldRecordPretty}}
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div style="background-color: rgb(255,243,213);border-radius: 25px;">
+                            通过率:{{p.clearRate}}<br>
+                            通关比:{{p.clears}}/{{p.attempts}}
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div style="background-color: rgb(255,243,213);border-radius: 25px;">
+                            关卡ID <br>
+                            {{p.map}}
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+            <div v-if="p.clearConditionName!=null">
+                通关条件:{{p.clearConditionName}} <br>
+                条件数量:{{p.clearConditionMagnitude}}
+            </div>
+            <div>
+                <el-row :gutter="20">
+                    <el-col :span="8">
+                        <div style="background-color: rgb(255,243,213);border-radius: 25px;">
+                            评论数:{{p.numComments}} <br>
+                            投图人:{{p.userName}}
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div class="grid-content bg-purple">
+                            <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 100px;text-align: center;
+                        text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
+                               href="javascript:void(0)" @click="play(p.map)">地图编辑器</a>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div class="grid-content bg-purple">
+                            <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 100px;text-align: center;
+                        text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
+                               href="javascript:void(0)" @click="play(p.map)">玩过了</a>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- import Vue before Element -->
 <script src="js/vue.js"></script>
@@ -36,29 +143,54 @@
 <script src="js/axios.min.js"></script>
 <script>
     var v = new Vue({
-            el: '#app',
-            data: function () {
-                return {
-                    arr: []
-                }
-            },
+        el: '#app',
+        data: function () {
+            return {
+                arr: [],
+                input:''
+            }
+        },
         created: function () {//此方法是Vue对象创建时执行的方法
             //一般会把加载完页面请求数据的代码写在此方法中
             axios.get("/list_noplay").then(function (response) {
                 v.arr = response.data;
             })
         },
-            methods: {
-                play(map) {
-                    axios.get("/play?map=" + map).then(function (response) {
-                        alert("标记完成！");
+        methods: {
+            play(map) {
+                axios.get("/play?map=" + map).then(function (response) {
+                    alert("标记完成！");
+                    location.reload();
+                })
+            },
+            add() {
+                let data = "name=乌冬面pp&msg="+v.input
+                axios.post("/add-map", data).then(function (response) {
+                    if (response.data.state == 200) {
+                        if (response.data.data.name == null) {
+                            alert("添加" + response.data.data.map + "完成！");
+                        } else {
+                            alert("添加" + response.data.data.name + "完成！");
+                        }
                         location.reload();
-                    })
-                }
+                    } else {
+                        alert("添加失败！因为:"+response.data.message);
+                    }
+                })
             }
-        })
+        }
+    })
 </script>
 <script>
+    function copyText() {
+        var text = document.getElementById("text").innerText;
+        var input = document.getElementById("input");
+        input.value = text; // 修改文本框的内容
+        input.select(); // 选中文本
+        document.execCommand("copy"); // 执行浏览器复制命令
+        alert("复制成功");
+    }
+
     var ws = new WebSocket('ws://' + location.host + '/adminWs');
     // 连接成功时:
     ws.addEventListener('open', function (event) {
@@ -67,11 +199,11 @@
     // 收到消息时:
     ws.addEventListener('message', function (event) {
         console.log('message: ' + event.data);
-        if (event.data.state==200) {
-        var msgs = JSON.parse(event.data.data);
-        console.log(msgs);
-        v.arr.push(msgs);
-        console.log(v.arr);
+        if (event.data.state == 200) {
+            var msgs = JSON.parse(event.data.data);
+            console.log(msgs);
+            v.arr.push(msgs);
+            console.log(v.arr);
         }
     });
     // 连接关闭时:

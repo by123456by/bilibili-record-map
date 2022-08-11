@@ -89,7 +89,7 @@ public class MapHandleService {
 			MapVO mapVO = new MapVO();
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
-			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工艺号",mapVO);
+			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工匠号",mapVO);
 		} else if (isMap == 2) {
 			MapVO mapVO = new MapVO();
 			mapVO.setUserName(dm.getName());
@@ -127,13 +127,13 @@ public class MapHandleService {
 		StringBuilder sbTagsName = new StringBuilder();
 
 		mapInfo.getTagsName().forEach(tag -> {
-			sbTagsName.append(",").append(tag);
+			sbTagsName.append("|").append(tag);
 		});
 		mapVO.setTagsName(sbTagsName.substring(1));
 
 		StringBuilder sbTags = new StringBuilder();
 		mapInfo.getTags().forEach(tag -> {
-			sbTags.append(",").append(tag);
+			sbTags.append("|").append(tag);
 		});
 		mapVO.setTags(sbTags.substring(1));
 
@@ -192,6 +192,9 @@ public class MapHandleService {
 			mapi += v;
 		}
 		String s = Long.toBinaryString(mapi);
+		while (s.length() < 44) {
+			s = "0" + s;
+		}
 		String binaryA = s.substring(0, 4);
 		String binaryB = s.substring(4, 10);
 		String binaryC = s.substring(10, 30);
