@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>弹幕状态回显</title>
     <!-- import CSS -->
-    <link rel="stylesheet" href="css/eui.css">
+<!--    <link rel="stylesheet" href="css/eui.css">-->
     <style>
         @font-face {
             font-family: "100";
@@ -13,7 +13,7 @@
 
         body {
             font-size: 40px;
-            font-family: "100",serif;
+            font-family: "100";
             background-color: rgba(0, 0, 0, 0);
             margin: 0 auto;
             overflow: visible;
@@ -21,13 +21,13 @@
 
         #app {
             line-height: 80px;
-            background-color: #8c939d;
+            background-color: rgba(10, 10, 10, 0.2);
+            border-radius: 25px;
         }
     </style>
 </head>
 <body>
 <div id="app" >
-
     <span>{{name}}</span>
     <span>{{m}}</span>
     <span>{{msg}}</span>
@@ -35,7 +35,7 @@
 <!-- import Vue before Element -->
 <script src="js/vue.js"></script>
 <!-- import JavaScript -->
-<script src="js/eui.js"></script>
+<!--<script src="js/eui.js"></script>-->
 <script src="js/axios.min.js"></script>
 <script>
     var v = new Vue({
@@ -62,6 +62,7 @@
                     } else if (danmuMsg.state == 200) {
                         v.msg = "收到投图:" + danmuMsg.data.name;
                     }
+                    v.m = ":";
                 } else {
                     v.name = "";
                     v.msg = "";
@@ -95,7 +96,11 @@
     // 连接关闭时:
     ws.addEventListener('close', function () {
         console.log('websocket closed.');
-        ws = new WebSocket('ws://' + location.host + '/danmuWs');
+        // ws = new WebSocket('ws://' + location.host + '/danmuWs'); TODO: 定时重连
+        v.name="系统";
+        v.m = ":";
+        v.msg = "连接断开";
+        clearInterval(v.timer);
     });
     // 绑定到全局变量:
     window.chatWs = ws;
