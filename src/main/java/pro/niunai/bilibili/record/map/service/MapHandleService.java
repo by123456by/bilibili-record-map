@@ -58,6 +58,13 @@ public class MapHandleService {
 			int r = mapMapper.insert(map);
 			if (r == 1) {
 				log.debug("数据库存入成功");
+				Thread thread = new Thread(() -> {
+					log.debug("预热图片");
+					String url = "https://tgrcode.lifan.one/mm2/level_thumbnail/" + map.getMap();
+					HttpUtil.get(url);
+					log.debug("预热完成{}",url);
+				});
+				thread.start();
 			} else {
 				log.debug("数据库存入失败");
 			}

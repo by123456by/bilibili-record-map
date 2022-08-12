@@ -66,7 +66,7 @@
                     </el-image>
                 </span>
                 <span style="float:left;margin-left: 10px">
-                    点赞:{{p.likes}} 点踩:{{p.boos}}
+                    点赞:{{p.likes}} 点踩:{{p.boos}} 评论数:{{p.numComments}}
                     <br>
                     标签:{{p.tagsName}}
                     <br>
@@ -78,8 +78,7 @@
                 </span>
             </div>
             <div style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px">
-                地图简介:{{p.description}} <br>
-                投图弹幕:{{p.danmu}}
+                {{p.description}}
             </div>
             <div style="margin-bottom: 7px">
                 <el-row :gutter="20">
@@ -111,8 +110,8 @@
                 <el-row :gutter="20">
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
-                            评论数:{{p.numComments}} <br>
-                            投图人:{{p.userName}}
+                            投图人:{{p.userName}}<br>
+                            投图弹幕:{{p.danmu}}
                         </div>
                     </el-col>
                     <el-col :span="8">
@@ -168,9 +167,9 @@
                 axios.post("/add-map", data).then(function (response) {
                     if (response.data.state == 200) {
                         if (response.data.data.name == null) {
-                            alert("添加" + response.data.data.map + "完成！");
+                            alert("添加[" + response.data.data.map + "]完成！");
                         } else {
-                            alert("添加" + response.data.data.name + "完成！");
+                            alert("添加[" + response.data.data.name + "]完成！");
                         }
                         location.reload();
                     } else {
