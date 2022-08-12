@@ -119,7 +119,7 @@
                             <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
                         display:inline-block;line-height: 100px;text-align: center;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
-                               :href="'https://smm2-viewer.com/courses/'+p.map" target="view_window">地图编辑器</a>
+                               href="javascript:void(0)" @click="play(p.map)">地图编辑器</a>
                         </div>
                     </el-col>
                     <el-col :span="8">
@@ -146,7 +146,7 @@
         data: function () {
             return {
                 arr: [],
-                input: ''
+                input:''
             }
         },
         created: function () {//此方法是Vue对象创建时执行的方法
@@ -163,7 +163,7 @@
                 })
             },
             add() {
-                let data = "name=乌冬面pp&msg=" + v.input
+                let data = "name=乌冬面pp&msg="+v.input
                 axios.post("/add-map", data).then(function (response) {
                     if (response.data.state == 200) {
                         if (response.data.data.name == null) {
@@ -173,7 +173,7 @@
                         }
                         location.reload();
                     } else {
-                        alert("添加失败！因为:" + response.data.message);
+                        alert("添加失败！因为:"+response.data.message);
                     }
                 })
             }
