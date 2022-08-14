@@ -1,0 +1,3 @@
+[submodule "src/main/resources/static/danmu"]
+	path = src/main/resources/static/danmu
+	url = https://github.com/Jiaocz/bilibili-record-map-capture.git
