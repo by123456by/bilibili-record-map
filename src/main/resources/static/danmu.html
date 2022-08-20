@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>弹幕状态回显</title>
     <!-- import CSS -->
-<!--    <link rel="stylesheet" href="css/eui.css">-->
+    <link rel="stylesheet" href="css/eui.css">
     <style>
         @font-face {
             font-family: "100";
@@ -12,69 +12,96 @@
         }
 
         body {
-            font-size: 40px;
+            /*font-size: 40px;*/
             font-family: "100";
             background-color: rgba(0, 0, 0, 0);
             margin: 0 auto;
             overflow: visible;
         }
 
-        #app {
-            line-height: 80px;
-            background-color: rgba(10, 10, 10, 0.2);
-            border-radius: 25px;
-        }
+        /*#app {*/
+        /*    line-height: 80px;*/
+        /*    background-color: rgba(10, 10, 10, 0.2);*/
+        /*    border-radius: 25px;*/
+        /*}*/
     </style>
 </head>
 <body>
-<div id="app" >
-    <span>{{name}}</span>
-    <span>{{m}}</span>
-    <span>{{msg}}</span>
+<div id="app">
+
 </div>
 <!-- import Vue before Element -->
 <script src="js/vue.js"></script>
 <!-- import JavaScript -->
-<!--<script src="js/eui.js"></script>-->
+<script src="js/eui.js"></script>
 <script src="js/axios.min.js"></script>
 <script>
     var v = new Vue({
         el: '#app',
         data: function () {
             return {
-                timer: '',
-                danmu: [],
-                name: "程序启动",
-                m: ":",
-                msg: "正在初始化"
+                type: 0,//显示位置 0上 1左上 2右上 3右下 4左下
+                duration: 8000//显示时间
+            }
+        },
+        mounted: function () {
+            this.type = decodeURIComponent((new RegExp('[?|&]' + 'type' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+            this.duration = decodeURIComponent((new RegExp('[?|&]' + 'duration' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+            if (this.type == null) {
+                this.type = 0;
+            }
+            if (this.duration == null) {
+                this.duration = 8000;
             }
         },
         methods: {
-            add() {
-                if (v.danmu.length > 0) {
-                    let danmuMsg = v.danmu.splice(0, 1)[0];
-                    console.log(danmuMsg)
-                    v.name = danmuMsg.data.userName;
-                    if (danmuMsg.state == 100) {
-                        v.msg = danmuMsg.message;
-                    } else if (danmuMsg.state != 200) {
-                        v.msg = "投图失败，原因：" + danmuMsg.message;
-                    } else if (danmuMsg.state == 200) {
-                        v.msg = "收到投图:" + danmuMsg.data.name;
-                    }
-                    v.m = ":";
+            send(name, msg, type) {
+                //msg显示信息
+                //type 0 消息 1成功 2失败 3警告
+                let msgType;
+                if (type == 0) {
+                    msgType = 'info'
+                }
+                if (type == 1) {
+                    msgType = 'success'
+                }
+                if (type == 2) {
+                    msgType = 'error'
+                }
+                if (type == 3) {
+                    msgType = 'warning'
+                }
+                if (v.type == 0) {
+                    this.$message({
+                        message: name + ':' + msg,
+                        type: msgType,
+                        duration: v.duration,
+                        center: true
+                    });
                 } else {
-                    v.name = "";
-                    v.msg = "";
-                    v.m = "";
+                    let msgPosition;
+                    if (v.type == 1) {
+                        msgPosition = 'top-left';
+                    }
+                    if (v.type == 2) {
+                        msgPosition = 'top-right';
+                    }
+                    if (v.type == 3) {
+                        msgPosition = 'bottom-right';
+                    }
+                    if (v.type == 4) {
+                        msgPosition = 'bottom-left';
+                    }
+                    this.$notify({
+                        title: name,
+                        message: msg,
+                        showClose: false,
+                        duration: v.duration,
+                        position: msgPosition,
+                        type: msgType
+                    });
                 }
             }
-        },
-        mounted() {
-            this.timer = setInterval(this.add, 5000);
-        },
-        beforeDestroy() {
-            clearInterval(this.timer);
         }
     })
 </script>
@@ -83,24 +110,29 @@
     // 连接成功时:
     ws.addEventListener('open', function (event) {
         console.log('websocket connected.');
+        v.send("系统", "客户端连接成功", 0);
     });
-
     // 收到消息时:
     ws.addEventListener('message', function (event) {
         console.log('message: ' + event.data);
         var msgs = JSON.parse(event.data);
         console.log(msgs);
-        v.danmu.push(msgs);
-        console.log(v.danmu);
+
+        let name = msgs.data.userName;
+        if (msgs.state == 100) {
+            v.send(name, msgs.message, 0);
+        } else if (msgs.state != 200) {
+            v.send(name, "投图失败，原因【" + msgs.data.map + '|' + msgs.message + '】', 2);
+        } else if (msgs.state == 200) {
+            v.send(name, "收到投图【" + msgs.data.name + '|' + msgs.data.map + '】', 1);
+        }
     });
     // 连接关闭时:
     ws.addEventListener('close', function () {
         console.log('websocket closed.');
         // ws = new WebSocket('ws://' + location.host + '/danmuWs'); TODO: 定时重连
-        v.name="系统";
-        v.m = ":";
-        v.msg = "连接断开";
-        clearInterval(v.timer);
+        v.duration = 0
+        v.send("系统:连接断开", 0);
     });
     // 绑定到全局变量:
     window.chatWs = ws;

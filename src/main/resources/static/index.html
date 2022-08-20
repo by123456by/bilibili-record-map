@@ -39,15 +39,35 @@
 </head>
 <body>
 <div id="app">
-    <div style="margin: 0 auto;width: 600px">
-        <a id="text">http://localhost:8080/danmu/release/index.html</a>
-        <input id="input">
-        <el-button size="mini" type="primary" onclick="copyText()">复制</el-button>
-        此链接添加到直播姬进行展示
-    </div>
-    <div style="margin: 0 auto;width: 300px;">
-        <el-input style="width: 200px" v-model="input" placeholder="图号"></el-input>
-        <el-button @click="add()" type="primary">投图</el-button>
+    <div style="margin: 0 auto;text-align:center">
+        <div>
+            <a id="text" v-text="url"></a>
+            <input id="input">
+            <el-button size="mini" type="primary" onclick="copyText()">复制</el-button>
+            此链接添加到直播姬进行展示
+        </div>
+        <div>
+            设置显示位置:
+            <template>
+                <el-select v-model="value" @change="handleChange" placeholder="请选择显示位置">
+                    <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </template>
+            设置显示时长:
+            <template>
+                <el-input-number v-model="num" controls-position="right" :precision="3" @change="handleChange" :min="1"
+                                 :max="100"></el-input-number>
+            </template>
+        </div>
+        <div>
+            <el-input style="width: 200px" v-model="input" placeholder="图号"></el-input>
+            <el-button @click="add()" type="primary">投图</el-button>
+        </div>
     </div>
     <div>
         <div class="map" v-for="p in arr">
@@ -70,7 +90,8 @@
                     <br>
                     标签:{{p.tagsName}}
                     <br>
-                    上传时间:{{p.uploadedPretty}}
+                    上传时间:
+                    <span v-text="timestampToTime(p.uploaded)"></span>
                     <br>
                     作者通关时间:{{p.uploadTimePretty}}
                     <br>
@@ -111,6 +132,8 @@
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             投图人:{{p.userName}}<br>
+                            投图时间:
+                            <span v-text="timestampToTime(p.createTimestamp)"></span><br>
                             投图弹幕:{{p.danmu}}
                         </div>
                     </el-col>
@@ -119,7 +142,7 @@
                             <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
                         display:inline-block;line-height: 100px;text-align: center;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
-                               href="javascript:void(0)" @click="play(p.map)">地图编辑器</a>
+                               :href="'https://www.smm2-viewer.com/courses/'+p.map" target="view_window">地图编辑器</a>
                         </div>
                     </el-col>
                     <el-col :span="8">
@@ -146,7 +169,26 @@
         data: function () {
             return {
                 arr: [],
-                input:''
+                input: '',
+                options: [{
+                    value: '0',
+                    label: '上方'
+                }, {
+                    value: '1',
+                    label: '左上'
+                }, {
+                    value: '2',
+                    label: '右上'
+                }, {
+                    value: '3',
+                    label: '右下'
+                }, {
+                    value: '4',
+                    label: '左下'
+                }],
+                value: '0',
+                num: 8,
+                url: 'http://localhost:8080/danmu.html'
             }
         },
         created: function () {//此方法是Vue对象创建时执行的方法
@@ -163,7 +205,7 @@
                 })
             },
             add() {
-                let data = "name=乌冬面pp&msg="+v.input
+                let data = "name=乌冬面pp&msg=" + v.input
                 axios.post("/add-map", data).then(function (response) {
                     if (response.data.state == 200) {
                         if (response.data.data.name == null) {
@@ -173,9 +215,22 @@
                         }
                         location.reload();
                     } else {
-                        alert("添加失败！因为:"+response.data.message);
+                        alert("添加失败！因为:" + response.data.message);
                     }
                 })
+            },
+            handleChange() {
+                v.url = 'http://localhost:8080/danmu.html?type=' + v.value + "&duration=" + v.num * 1000
+            },
+            timestampToTime(timestamp) {
+                var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                var Y = date.getFullYear() + '-';
+                var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1):date.getMonth()+1) + '-';
+                var D = (date.getDate()< 10 ? '0'+date.getDate():date.getDate())+ ' ';
+                var h = (date.getHours() < 10 ? '0'+date.getHours():date.getHours())+ ':';
+                var m = (date.getMinutes() < 10 ? '0'+date.getMinutes():date.getMinutes()) + ':';
+                var s = date.getSeconds() < 10 ? '0'+date.getSeconds():date.getSeconds();
+                return Y+M+D+h+m+s;
             }
         }
     })

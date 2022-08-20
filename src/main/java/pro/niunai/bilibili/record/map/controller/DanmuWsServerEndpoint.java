@@ -35,8 +35,8 @@ public class DanmuWsServerEndpoint {
 		System.out.println("弹幕回显连接成功");
 		map.put(session.getId(), session);
 		MapVO mapVO = new MapVO();
-		mapVO.setUserName("初始化");
-		sendMessage(JSON.toJSONString(JsonResult.failed(CONTINUE, "连接成功",mapVO)));
+		mapVO.setUserName("系统");
+		sendMessage(JSON.toJSONString(JsonResult.failed(CONTINUE, "服务端连接成功",mapVO)));
 	}
 
 	/**
