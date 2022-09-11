@@ -18,6 +18,12 @@
                 #{clears}, #{attempts}, #{versusMatches}, #{plays}, #{clearRate}, #{coopMatches}, #{likes}, #{boos},
                 #{uniquePlayersAndVersus}, #{weeklyLikes}, #{weeklyPlays}, #{status}, #{isMap})
     </insert>
+    <delete id="deleteByMap" parameterType="String">
+        delete from map where map in
+        <foreach item="map" collection="array" open="(" separator="," close=")">
+        #{map}
+    </foreach>
+    </delete>
     <update id="updateStatusByMap">
         update map
         set status=#{status}

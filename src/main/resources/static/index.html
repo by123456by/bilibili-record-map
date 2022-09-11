@@ -67,6 +67,15 @@
         <div>
             <el-input style="width: 200px" v-model="input" placeholder="图号"></el-input>
             <el-button @click="add()" type="primary">投图</el-button>
+
+            <template>
+                <el-popconfirm
+                        title="确定删除当前全部投图吗？"
+                        @confirm="deleteMap()"
+                >
+                    <el-button slot="reference" type="danger">删除当前全部投图</el-button>
+                </el-popconfirm>
+            </template>
         </div>
     </div>
     <div>
@@ -75,6 +84,14 @@
                 <span style="color: #66b1ff">{{p.gameStyleName}}</span>
                 <span style="color: #5daf34">{{p.themeName}}</span>
                 <span>{{p.name}}</span>
+                <template>
+                    <el-popconfirm
+                            title="确定删除吗？"
+                            @confirm="deleteMap(p.map)"
+                    >
+                        <el-button style="float: right" size="mini" type="danger" slot="reference">删除</el-button>
+                    </el-popconfirm>
+                </template>
             </div>
             <div style="height: 130px">
                 <span style="float:left">
@@ -204,6 +221,19 @@
                     location.reload();
                 })
             },
+            deleteMap(map){
+                let mapArr = [];
+                if (map == null) {
+                    for (let i = 0; i < v.arr.length; i++) {
+                        mapArr.push(v.arr[i].map);
+                    }
+                } else {
+                    mapArr.push(map)
+                }
+                axios.post("/delete-map", mapArr).then(function (response) {
+                    location.reload();
+                });
+            },
             add() {
                 let data = "name=乌冬面pp&msg=" + v.input
                 axios.post("/add-map", data).then(function (response) {
@@ -252,11 +282,10 @@
     });
     // 收到消息时:
     ws.addEventListener('message', function (event) {
-        console.log('message: ' + event.data);
-        if (event.data.state == 200) {
-            var msgs = JSON.parse(event.data.data);
-            console.log(msgs);
-            v.arr.push(msgs);
+        var msgs = JSON.parse(event.data);
+        console.log('message: ' + msgs);
+        if (msgs.state == 200) {
+            v.arr.push(msgs.data);
             console.log(v.arr);
         }
     });

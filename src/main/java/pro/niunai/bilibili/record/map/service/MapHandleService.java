@@ -90,20 +90,19 @@ public class MapHandleService {
 		if (ResultMap.getState() != 200) {
 			return ResultMap;
 		}
+		MapVO mapVO = new MapVO();
 		String mapText = (String) ResultMap.getData();
+		mapVO.setMap(mapText);
 		int isMap = verifyMap(mapText);
 		if (isMap == 3) {
-			MapVO mapVO = new MapVO();
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
 			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工匠号",mapVO);
 		} else if (isMap == 2) {
-			MapVO mapVO = new MapVO();
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
 			return JsonResult.failed(NOT_MAP_VALIDATION_ERROR, "图号验证错误",mapVO);
 		} else if (isMap == 1) {
-			MapVO mapVO = new MapVO();
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
 			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号验证错误",mapVO);
@@ -113,13 +112,11 @@ public class MapHandleService {
 			mapInfo = getMapInfo(mapText);
 		} catch (Exception e) {
 			log.error("地图信息解析错误");
-			MapVO mapVO = new MapVO();
 
 			BeanUtils.copyProperties(mapInfo, mapVO);
 
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
-			mapVO.setMap(mapText);
 			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
 			mapVO.setIsMap(1);
 			mapVO.setStatus(NOPLAY);
@@ -128,7 +125,6 @@ public class MapHandleService {
 			return JsonResult.ok(mapVO);
 		}
 
-		MapVO mapVO = new MapVO();
 		BeanUtils.copyProperties(mapInfo, mapVO);
 
 		StringBuilder sbTagsName = new StringBuilder();

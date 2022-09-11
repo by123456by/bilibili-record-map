@@ -9,14 +9,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pro.niunai.bilibili.record.map.mapper.MapMapper;
 import pro.niunai.bilibili.record.map.pojo.*;
 import pro.niunai.bilibili.record.map.service.MapHandleService;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static pro.niunai.bilibili.record.map.pojo.ResponseCode.*;
@@ -62,7 +60,13 @@ public class MapController {
 		mapHandleService.sendMsg(jsonResult);
 		return jsonResult;
 	}
-
+	@ApiOperation("添加投图")
+	@PostMapping("/delete-map")
+	public JsonResult deleteMap(@RequestBody String[] map) {
+		mapMapper.deleteByMap(map);
+		log.debug("删除图号为:{}",Arrays.toString(map));
+		return JsonResult.ok();
+	}
 	@ApiOperation("获取全部投图列表")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "int"),

@@ -23,4 +23,6 @@ public interface  MapMapper {
 	List<MapVO> selectListByNoPlay();
 	//获取最新一条的投图信息
 	MapVO selectMapByNew();
+	//删除地图
+	int deleteByMap(String[] map);
 }
