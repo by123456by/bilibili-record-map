@@ -97,15 +97,18 @@ public class MapHandleService {
 		if (isMap == 3) {
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
+			log.debug("投图信息为工匠号:{}",mapVO);
 			return JsonResult.failed(NOT_MAP_CRAFTSMAN, "为工匠号",mapVO);
 		} else if (isMap == 2) {
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
+			log.debug("图号验证错误:{}",mapVO);
 			return JsonResult.failed(NOT_MAP_VALIDATION_ERROR, "图号验证错误",mapVO);
 		} else if (isMap == 1) {
 			mapVO.setUserName(dm.getName());
 			mapVO.setDanmu(dm.getMsg());
-			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号验证错误",mapVO);
+			log.debug("图号验证错误:{}",mapVO);
+			return JsonResult.failed(NOT_MAP_FORMAT_ERROR, "图号格式错误",mapVO);
 		}
 		MapInfo mapInfo = new MapInfo();
 		try {
@@ -120,8 +123,8 @@ public class MapHandleService {
 			mapVO.setCreateTimestamp((int) (System.currentTimeMillis() / 1000));
 			mapVO.setIsMap(1);
 			mapVO.setStatus(NOPLAY);
+			mapVO.setMap(mapText);
 			log.debug("解析到地图信息：{}", mapVO);
-
 			return JsonResult.ok(mapVO);
 		}
 

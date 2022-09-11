@@ -72,11 +72,24 @@ public class MapController {
 			@ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "int"),
 			@ApiImplicitParam(name = "pageSize", value = "每页条数", required = true, dataType = "int")
 	})
-	@GetMapping("/list")
-	public JsonPage<MapVO> list(Integer page, Integer pageSize) {
+
+/*	@GetMapping("/list")
+	public JsonPage<MapVO> list(String status,Integer page, Integer pageSize) {
+		log.debug("查询列表为:{},页数:{},:页大小{}", status, page, pageSize);
+		if (page==null) {
+			page = 0;
+		}
+		if (pageSize==null) {
+			pageSize = Integer.MAX_VALUE;
+		}
 		PageHelper.startPage(page, pageSize);
-		List<MapVO> mapVOS = mapMapper.selectList();
+		List<MapVO> mapVOS = mapMapper.selectList(status);
 		return JsonPage.restPage(new PageInfo<>(mapVOS));
+	}*/
+
+	@GetMapping("/list")
+	public List<MapVO> list(String status) {
+		return mapMapper.selectList(status);
 	}
 
 	@ApiOperation("获取全部未玩列表")
@@ -93,4 +106,12 @@ public class MapController {
 		}
 		mapMapper.updateStatusByMap(map, status);
 	}
+
+	@ApiOperation("查询全部状态列表")
+	@GetMapping("/status-list")
+	public JsonResult statusList() {
+		return JsonResult.ok(mapMapper.selectMapStatus());
+	}
+
+
 }

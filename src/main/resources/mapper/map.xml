@@ -21,8 +21,8 @@
     <delete id="deleteByMap" parameterType="String">
         delete from map where map in
         <foreach item="map" collection="array" open="(" separator="," close=")">
-        #{map}
-    </foreach>
+            #{map}
+        </foreach>
     </delete>
     <update id="updateStatusByMap">
         update map
@@ -34,9 +34,19 @@
         from map
         where map = #{map}
     </select>
+    <select id="selectMapStatus" resultType="String">
+        select status
+        from map
+        group by status;
+    </select>
     <select id="selectList" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
         select *
         from map
+        <where>
+            <if test="status!=null and status!=''">
+                status = #{status}
+            </if>
+        </where>
         order by create_timestamp
     </select>
     <select id="selectMapByNew" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
@@ -48,7 +58,7 @@
     <select id="selectListByNoPlay" resultType="pro.niunai.bilibili.record.map.pojo.MapVO">
         select *
         from map
-        where status='未玩'
+        where status = '未玩'
         order by create_timestamp
     </select>
 </mapper>

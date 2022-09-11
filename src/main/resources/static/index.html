@@ -6,14 +6,10 @@
     <!-- import CSS -->
     <link rel="stylesheet" href="css/eui.css">
     <style>
-        @font-face {
-            font-family: "100";
-            src: url("css/fonts/100.TTF") ;
-        }
 
         body {
             background-color: rgb(212, 207, 196);
-            font-family: "100";
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
             margin: 0 auto;
         }
 
@@ -77,13 +73,25 @@
                 </el-popconfirm>
             </template>
         </div>
+        <div>
+            <template>
+                <sapn>当前展示的标记类型:</sapn>
+                <el-select v-model="status" @change="handleStatus" filterable placeholder="请选择">
+                    <el-option
+                            v-for="item in statusList"
+                            :label="item"
+                            :value="item">
+                    </el-option>
+                </el-select>
+            </template>
+        </div>
     </div>
     <div>
-        <div class="map" v-for="p in arr">
+        <div class="map" v-for="(p,i) in arr">
             <div style="margin-bottom: 7px">
                 <span style="color: #66b1ff">{{p.gameStyleName}}</span>
                 <span style="color: #5daf34">{{p.themeName}}</span>
-                <span>{{p.name}}</span>
+                <span @click="fanyiName(i)">{{p.name}}</span>
                 <template>
                     <el-popconfirm
                             title="确定删除吗？"
@@ -115,7 +123,8 @@
                     难度:{{p.difficulty}}-{{p.difficultyName}}
                 </span>
             </div>
-            <div style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px">
+            <div @click="fanyiDescription(i)"
+                 style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px">
                 {{p.description}}
             </div>
             <div style="margin-bottom: 7px">
@@ -164,10 +173,38 @@
                     </el-col>
                     <el-col :span="8">
                         <div class="grid-content bg-purple">
-                            <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
-                        display:inline-block;line-height: 100px;text-align: center;
+                            <a style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 48px;text-align: center;margin-bottom: 4px;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
-                               href="javascript:void(0)" @click="play(p.map)">玩过了</a>
+                               href="javascript:void(0)" @click="play(p.map,'玩过了')">玩过了</a>
+                        </div>
+                        <div class="grid-content bg-purple">
+
+                            <el-popover
+                                    placement="top"
+                                    width="160"
+                                    v-model="visible">
+                                <template>
+                                    <sapn>请选择或输入标记类型:</sapn>
+                                    <el-select allow-create default-first-option v-model="statusValue" filterable
+                                               placeholder="请选择">
+                                        <el-option
+                                                v-for="item in statusList"
+                                                :label="item"
+                                                :value="item">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                                <div style="text-align: right; margin: 0">
+                                    <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+                                    <el-button type="primary" size="mini" @click="play(p.map,statusValue)">确定
+                                    </el-button>
+                                </div>
+                                <a slot="reference" style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 48px;text-align: center;
+                        text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
+                                   href="javascript:void(0)">标记</a>
+                            </el-popover>
                         </div>
                     </el-col>
                 </el-row>
@@ -176,15 +213,25 @@
     </div>
 </div>
 <!-- import Vue before Element -->
+
+
 <script src="js/vue.js"></script>
 <!-- import JavaScript -->
 <script src="js/eui.js"></script>
 <script src="js/axios.min.js"></script>
+<script src="./js/bdfykey.js"></script>
+<script src="./js/md5.js"></script>
+<script src="https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js"></script>
+
 <script>
     var v = new Vue({
         el: '#app',
         data: function () {
             return {
+                visible: false,
+                statusList: [],
+                statusValue: '未玩',
+                status: '未玩',
                 arr: [],
                 input: '',
                 options: [{
@@ -212,16 +259,78 @@
             //一般会把加载完页面请求数据的代码写在此方法中
             axios.get("/list_noplay").then(function (response) {
                 v.arr = response.data;
-            })
+            });
+            axios.get("/status-list").then(function (response) {
+                console.log(response);
+                v.statusList = response.data.data;
+            });
         },
         methods: {
-            play(map) {
-                axios.get("/play?map=" + map).then(function (response) {
-                    alert("标记完成！");
-                    location.reload();
+            fanyiName(i) {
+                let query = v.arr[i].name;
+                let salt = (new Date).getTime();
+                let from = 'auto';
+                let to = 'zh';
+                var str1 = appid + query + salt + key;
+                let sign = MD5(str1);
+                $.ajax({
+                    url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+                    type: 'get',
+                    dataType: 'jsonp',
+                    data: {
+                        q: query,
+                        appid: appid,
+                        salt: salt,
+                        from: from,
+                        to: to,
+                        sign: sign
+                    },
+                    success: function (data) {
+                        if (data.trans_result[0].dst) {
+                            v.arr[i].name = data.trans_result[0].dst
+                        }
+                    }
+                });
+            },
+            fanyiDescription(i) {
+                let query = v.arr[i].description;
+                let salt = (new Date).getTime();
+                let from = 'auto';
+                let to = 'zh';
+                var str1 = appid + query + salt + key;
+                let sign = MD5(str1);
+                $.ajax({
+                    url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+                    type: 'get',
+                    dataType: 'jsonp',
+                    data: {
+                        q: query,
+                        appid: appid,
+                        salt: salt,
+                        from: from,
+                        to: to,
+                        sign: sign
+                    },
+                    success: function (data) {
+                        if (data.trans_result[0].dst) {
+                            v.arr[i].description = data.trans_result[0].dst
+                        }
+                    }
+                });
+            },
+            handleStatus() {
+                axios.get("/list?status=" + v.status).then(function (response) {
+                    v.arr = response.data;
                 })
             },
-            deleteMap(map){
+            play(map, status) {
+                visible = false;
+                axios.get("/play?map=" + map + "&status=" + status).then(function (response) {
+                    v.$message.success('标记完成！');
+                    v.handleStatus();
+                })
+            },
+            deleteMap(map) {
                 let mapArr = [];
                 if (map == null) {
                     for (let i = 0; i < v.arr.length; i++) {
@@ -231,7 +340,7 @@
                     mapArr.push(map)
                 }
                 axios.post("/delete-map", mapArr).then(function (response) {
-                    location.reload();
+                    v.handleStatus();
                 });
             },
             add() {
@@ -239,13 +348,14 @@
                 axios.post("/add-map", data).then(function (response) {
                     if (response.data.state == 200) {
                         if (response.data.data.name == null) {
-                            alert("添加[" + response.data.data.map + "]完成！");
+                            v.$message.success("添加[" + response.data.data.map + "]完成！");
                         } else {
-                            alert("添加[" + response.data.data.name + "]完成！");
+                            v.$message.success("添加[" + response.data.data.name + "]完成！");
                         }
-                        location.reload();
+                        v.status = '未玩';
+                        v.handleStatus();
                     } else {
-                        alert("添加失败！因为:" + response.data.message);
+                        v.$message.error("添加失败！因为:" + response.data.message);
                     }
                 })
             },
@@ -255,12 +365,12 @@
             timestampToTime(timestamp) {
                 var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
                 var Y = date.getFullYear() + '-';
-                var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1):date.getMonth()+1) + '-';
-                var D = (date.getDate()< 10 ? '0'+date.getDate():date.getDate())+ ' ';
-                var h = (date.getHours() < 10 ? '0'+date.getHours():date.getHours())+ ':';
-                var m = (date.getMinutes() < 10 ? '0'+date.getMinutes():date.getMinutes()) + ':';
-                var s = date.getSeconds() < 10 ? '0'+date.getSeconds():date.getSeconds();
-                return Y+M+D+h+m+s;
+                var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
+                var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+                var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+                var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+                return Y + M + D + h + m + s;
             }
         }
     })
@@ -272,7 +382,7 @@
         input.value = text; // 修改文本框的内容
         input.select(); // 选中文本
         document.execCommand("copy"); // 执行浏览器复制命令
-        alert("复制成功");
+        v.$message.success("复制成功");
     }
 
     var ws = new WebSocket('ws://' + location.host + '/adminWs');
