@@ -95,14 +95,15 @@
                 <template>
                     <el-popconfirm
                             title="确定删除吗？"
-                            @confirm="deleteMap(p.map)"
-                    >
+                            @confirm="deleteMap(p.map)">
                         <el-button style="float: right" size="mini" type="danger" slot="reference">删除</el-button>
                     </el-popconfirm>
                 </template>
             </div>
             <div style="height: 130px">
-                <span style="float:left">
+                <el-row>
+                    <el-col :span="10">
+                        <span>
                     <el-image
                             lazy
                             style="height: 120px;width: 213px"
@@ -111,46 +112,49 @@
                         <el-image slot="placeholder" src="./img/loding.gif"></el-image>
                     </el-image>
                 </span>
-                <span style="float:left;margin-left: 10px">
+                    </el-col>
+                    <el-col :span="14">
+                        <span style="margin-left: 10px">
                     点赞:{{p.likes}} 点踩:{{p.boos}} 评论数:{{p.numComments}}
                     <br>
                     标签:{{p.tagsName}}
-                    <br>
-                    上传时间:
-                    <span v-text="timestampToTime(p.uploaded)"></span>
-                    <br>
-                    作者通关时间:{{p.uploadTimePretty}}
-                    <br>
-                    难度:{{p.difficulty}}-{{p.difficultyName}}
-                </span>
-            </div>
-            <div @click="fanyiDescription(i)"
-                 style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px">
-                {{p.description}}
+                </span><br>
+                        <div @click="fanyiDescription(i)"
+                              style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px">
+                    {{p.description}}
+                </div>
+                    </el-col>
+                </el-row>
+
             </div>
             <div style="margin-bottom: 7px">
                 <el-row :gutter="20">
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             最快通关时间 <br>
-                            {{p.worldRecordPretty}}
+                            {{p.worldRecordPretty}}<br>
+                            作者通关时间:<br>
+                            {{p.uploadTimePretty}}
                         </div>
                     </el-col>
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             通过率:{{p.clearRate}}<br>
-                            通关比:{{p.clears}}/{{p.attempts}}
+                            通关比:{{p.clears}}/{{p.attempts}}<br>
+                            难度:{{p.difficulty}}-{{p.difficultyName}}
                         </div>
                     </el-col>
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             关卡ID <br>
-                            <span v-text="p.map.substring(0,3)+'-'+p.map.substring(3,6)+'-'+p.map.substring(6,9)"></span>
+                            <span v-text="p.map.substring(0,3)+'-'+p.map.substring(3,6)+'-'+p.map.substring(6,9)"></span><br>
+                            投图弹幕:{{p.danmu}}
                         </div>
                     </el-col>
                 </el-row>
             </div>
-            <div v-if="p.clearConditionName!=null">
+            <div style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px"
+                    v-if="p.clearConditionName!=null">
                 通关条件:{{p.clearConditionName}} <br>
                 条件数量:{{p.clearConditionMagnitude}}
             </div>
@@ -159,21 +163,22 @@
                     <el-col :span="8">
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             投图人:{{p.userName}}<br>
-                            投图时间:
+                            投图时间:<br>
                             <span v-text="timestampToTime(p.createTimestamp)"></span><br>
-                            投图弹幕:{{p.danmu}}
+                            作者上传时间:<br>
+                            <span v-text="timestampToTime(p.uploaded)"></span>
                         </div>
                     </el-col>
                     <el-col :span="8">
                         <div class="grid-content bg-purple">
-                            <a style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
-                        display:inline-block;line-height: 48px;text-align: center;margin-bottom: 4px;
+                            <a style="height: 52px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 52px;text-align: center;margin-bottom: 4px;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
                                :href="'https://www.smm2-viewer.com/courses/'+p.map" target="view_window">地图编辑器</a>
                         </div>
                         <div class="grid-content bg-purple">
-                            <a style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
-                        display:inline-block;line-height: 48px;text-align: center;
+                            <a style="height: 52px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 52px;text-align: center;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
                                :href="'https://smm2.wizul.us/smm2/level/'+p.map" target="view_window">另个编辑器</a>
                         </div>
@@ -408,7 +413,7 @@
             setTimeout(function () {
                 v.arr[i].img = undefined;
                 v.$forceUpdate();
-            },5000);
+            }, 5000);
 
         }
         let name = msgs.data.userName;
