@@ -89,9 +89,19 @@
     <div>
         <div class="map" v-for="(p,i) in arr" :key="p.map">
             <div style="margin-bottom: 7px">
-                <span style="color: #66b1ff">{{p.gameStyleName}}</span>
-                <span style="color: #5daf34">{{p.themeName}}</span>
-                <span @click="fanyiName(i)">{{p.name}}</span>
+                <span style="color: #66b1ff">
+                    <!--{{p.gameStyleName}}-->
+                    <el-tooltip class="item" effect="light" :content="gameStyleCN(p.gameStyle)" placement="top">
+                         <el-image :src="'./img/style'+p.gameStyle+'.png'" lazy style="height: 24px;"></el-image>
+                    </el-tooltip>
+                </span>
+                <span style="color: #5daf34">
+                    <!--{{p.themeName}}-->
+                    <el-tooltip class="item" effect="light" :content="themeCN(p.theme)" placement="top">
+                        <el-image :src="'./img/theme'+p.theme+'.png'" lazy style="height: 24px;"></el-image>
+                    </el-tooltip>
+                </span>
+                <span style="line-height: 24px;" @click="fanyiName(i)">{{p.name}}</span>
                 <template>
                     <el-popconfirm
                             title="确定删除吗？"
@@ -115,14 +125,15 @@
                     </el-col>
                     <el-col :span="14">
                         <span style="margin-left: 10px">
-                    点赞:{{p.likes}} 点踩:{{p.boos}} 评论数:{{p.numComments}}
+                    点赞:{{p.likes}} 点踩:{{p.boos}} 评论数:{{p.numComments}} 游玩人数：{{p.plays}}
                     <br>
-                    标签:{{p.tagsName}}
+                    标签:{{tsgsCN(p.tags)}}
+                            <!--{{p.tagsName}}-->
                 </span><br>
                         <div @click="fanyiDescription(i)"
-                              style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px">
-                    {{p.description}}
-                </div>
+                             style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px">
+                            {{p.description}}
+                        </div>
                     </el-col>
                 </el-row>
 
@@ -141,7 +152,8 @@
                         <div style="background-color: rgb(255,243,213);border-radius: 25px;">
                             通过率:{{p.clearRate}}<br>
                             通关比:{{p.clears}}/{{p.attempts}}<br>
-                            难度:{{p.difficulty}}-{{p.difficultyName}}
+                            难度:{{difficultyCN(p.difficulty)}}
+                            <!--{{p.difficulty}}-{{p.difficultyName}}-->
                         </div>
                     </el-col>
                     <el-col :span="8">
@@ -153,8 +165,8 @@
                     </el-col>
                 </el-row>
             </div>
-            <div style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px"
-                    v-if="p.clearConditionName!=null">
+            <div @click="fanyiClearConditionName(i)" style="background-color: rgb(255,243,213);border-radius: 25px;margin-bottom: 7px;padding: 10px"
+                 v-if="p.clearConditionName!=null">
                 通关条件:{{p.clearConditionName}} <br>
                 条件数量:{{p.clearConditionMagnitude}}
             </div>
@@ -274,6 +286,105 @@
             });
         },
         methods: {
+            gameStyleCN(id) {
+                switch (id) {
+                    case 0:
+                        return '超级马力欧兄弟';
+                    case 1:
+                        return '超级马力欧兄弟3';
+                    case 2:
+                        return '超级马力欧世界';
+                    case 3:
+                        return 'New 超级马力欧兄弟 U';
+                    case 4:
+                        return '超级马力欧 3D世界';
+                }
+            },
+            themeCN(id) {
+                switch (id) {
+                    case 0:
+                        return '地上';
+                    case 1:
+                        return '地下';
+                    case 2:
+                        return '城堡';
+                    case 3:
+                        return '飞行船';
+                    case 4:
+                        return '水中';
+                    case 5:
+                        return '鬼屋';
+                    case 6:
+                        return '冰原';
+                    case 7:
+                        return '沙漠';
+                    case 8:
+                        return '天空';
+                    case 9:
+                        return '森林';
+                }
+            },
+            difficultyCN(id) {
+                switch (id) {
+                    case 0:
+                        return '简单';
+                    case 1:
+                        return '普通';
+                    case 2:
+                        return '困难';
+                    case 3:
+                        return '超难';
+                }
+            },
+            tsgsCN(ids) {
+                if (ids == null) {
+                    return;
+                }
+                let id = ids.split('|');
+                if (id[0] === id[1]) {
+                    let s = this.tagCN(id[0]);
+                    return s;
+                } else {
+                    return this.tagCN(id[0]) + ' ' + this.tagCN(id[1]);
+                }
+            },
+            tagCN(id) {
+                id = parseInt(id);
+                switch (id) {
+                    case 0:
+                        return '无';
+                    case 1:
+                        return '标准';
+                    case 2:
+                        return '解密';
+                    case 3:
+                        return '计时挑战';
+                    case 4:
+                        return '自动卷轴';
+                    case 5:
+                        return '自动马力欧';
+                    case 6:
+                        return '一次通过';
+                    case 7:
+                        return '多人对战';
+                    case 8:
+                        return '机关设计';
+                    case 9:
+                        return '音乐';
+                    case 10:
+                        return '美术';
+                    case 11:
+                        return '技巧';
+                    case 12:
+                        return '射击';
+                    case 13:
+                        return '对战BOSS';
+                    case 14:
+                        return '单打';
+                    case 15:
+                        return '林克';
+                }
+            },
             fanyiName(i) {
                 let query = v.arr[i].name;
                 let salt = (new Date).getTime();
@@ -322,6 +433,33 @@
                     success: function (data) {
                         if (data.trans_result[0].dst) {
                             v.arr[i].description = data.trans_result[0].dst
+                        }
+                    }
+                });
+            },
+            fanyiClearConditionName(i) {
+                let query = v.arr[i].clearConditionName;
+                let salt = (new Date).getTime();
+                let from = 'auto';
+                let to = 'zh';
+                var str1 = appid + query + salt + key;
+                let sign = MD5(str1);
+                $.ajax({
+                    url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+                    type: 'get',
+                    dataType: 'jsonp',
+                    data: {
+                        q: query,
+                        appid: appid,
+                        salt: salt,
+                        from: from,
+                        to: to,
+                        sign: sign,
+                        action:1
+                    },
+                    success: function (data) {
+                        if (data.trans_result[0].dst) {
+                            v.arr[i].clearConditionName = data.trans_result[0].dst
                         }
                     }
                 });
