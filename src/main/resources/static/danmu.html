@@ -124,7 +124,7 @@
         } else if (msgs.state != 200) {
             v.send(name, "投图失败，原因【" + msgs.data.map + '|' + msgs.message + '】', 2);
         } else if (msgs.state == 200) {
-            v.send(name, "收到投图【" + msgs.data.name + '|' + msgs.data.map + '】', 1);
+            v.send(name, "收到投图【" + msgs.data.map + '|' + msgs.data.name + '】', 1);
         }
     });
     // 连接关闭时:

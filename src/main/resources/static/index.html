@@ -75,7 +75,7 @@
         </div>
         <div>
             <template>
-                <sapn>当前展示的标记类型:</sapn>
+                <span>当前展示的标记类型:</span>
                 <el-select v-model="status" @change="handleStatus" filterable placeholder="请选择">
                     <el-option
                             v-for="item in statusList"
@@ -87,7 +87,7 @@
         </div>
     </div>
     <div>
-        <div class="map" v-for="(p,i) in arr">
+        <div class="map" v-for="(p,i) in arr" :key="p.map">
             <div style="margin-bottom: 7px">
                 <span style="color: #66b1ff">{{p.gameStyleName}}</span>
                 <span style="color: #5daf34">{{p.themeName}}</span>
@@ -105,9 +105,10 @@
                 <span style="float:left">
                     <el-image
                             lazy
-                            style="height: 120px"
-                            :src="'https://tgrcode.lifan.one/mm2/level_thumbnail/'+p.map"
+                            style="height: 120px;width: 213px"
+                            :src="p.img === undefined ? 'https://tgrcode.lifan.one/mm2/level_thumbnail/'+ p.map:'./img/loding.gif'"
                             :preview-src-list="['https://tgrcode.lifan.one/mm2/level_entire_thumbnail/'+p.map]">
+                        <el-image slot="placeholder" src="./img/loding.gif"></el-image>
                     </el-image>
                 </span>
                 <span style="float:left;margin-left: 10px">
@@ -165,10 +166,16 @@
                     </el-col>
                     <el-col :span="8">
                         <div class="grid-content bg-purple">
-                            <a style="height: 100px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
-                        display:inline-block;line-height: 100px;text-align: center;
+                            <a style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 48px;text-align: center;margin-bottom: 4px;
                         text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
                                :href="'https://www.smm2-viewer.com/courses/'+p.map" target="view_window">地图编辑器</a>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <a style="height: 48px;width: 100px;background-color: rgb(255,204,1);border-radius: 15px;
+                        display:inline-block;line-height: 48px;text-align: center;
+                        text-decoration:none;font-size: 18px;color: rgb(95, 28, 28);font-weight:bold"
+                               :href="'https://smm2.wizul.us/smm2/level/'+p.map" target="view_window">另个编辑器</a>
                         </div>
                     </el-col>
                     <el-col :span="8">
@@ -182,21 +189,18 @@
 
                             <el-popover
                                     placement="top"
-                                    width="160"
-                                    v-model="visible">
-                                <template>
-                                    <sapn>请选择或输入标记类型:</sapn>
-                                    <el-select allow-create default-first-option v-model="statusValue" filterable
-                                               placeholder="请选择">
-                                        <el-option
-                                                v-for="item in statusList"
-                                                :label="item"
-                                                :value="item">
-                                        </el-option>
-                                    </el-select>
-                                </template>
+                                    width="160">
+                                <span>请选择或输入标记类型:</span>
+                                <el-select allow-create default-first-option v-model="statusValue" filterable
+                                           placeholder="请选择">
+                                    <el-option
+                                            v-for="item in statusList"
+                                            :label="item"
+                                            :value="item">
+                                    </el-option>
+                                </el-select>
                                 <div style="text-align: right; margin: 0">
-                                    <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+                                    <!--                                    <el-button size="mini" type="text" @click="visible = false">取消</el-button>-->
                                     <el-button type="primary" size="mini" @click="play(p.map,statusValue)">确定
                                     </el-button>
                                 </div>
@@ -261,7 +265,6 @@
                 v.arr = response.data;
             });
             axios.get("/status-list").then(function (response) {
-                console.log(response);
                 v.statusList = response.data.data;
             });
         },
@@ -321,7 +324,10 @@
             handleStatus() {
                 axios.get("/list?status=" + v.status).then(function (response) {
                     v.arr = response.data;
-                })
+                });
+                axios.get("/status-list").then(function (response) {
+                    v.statusList = response.data.data;
+                });
             },
             play(map, status) {
                 visible = false;
@@ -346,17 +352,17 @@
             add() {
                 let data = "name=乌冬面pp&msg=" + v.input
                 axios.post("/add-map", data).then(function (response) {
-                    if (response.data.state == 200) {
-                        if (response.data.data.name == null) {
-                            v.$message.success("添加[" + response.data.data.map + "]完成！");
-                        } else {
-                            v.$message.success("添加[" + response.data.data.name + "]完成！");
-                        }
-                        v.status = '未玩';
-                        v.handleStatus();
-                    } else {
-                        v.$message.error("添加失败！因为:" + response.data.message);
-                    }
+                    /* if (response.data.state == 200) {
+                         if (response.data.data.name == null) {
+                             v.$message.success("添加[" + response.data.data.map + "]完成！");
+                         } else {
+                             v.$message.success("添加[" + response.data.data.name + "]完成！");
+                         }
+                         v.status = '未玩';
+                         v.handleStatus();
+                     } else {
+                         v.$message.error("添加失败！因为:" + response.data.message);
+                     }*/
                 })
             },
             handleChange() {
@@ -395,9 +401,46 @@
         var msgs = JSON.parse(event.data);
         console.log('message: ' + msgs);
         if (msgs.state == 200) {
-            v.arr.push(msgs.data);
+            msgs.data.img = "";
+            let i = v.arr.push(msgs.data) - 1;
             console.log(v.arr);
+
+            setTimeout(function () {
+                v.arr[i].img = undefined;
+                v.$forceUpdate();
+            },5000);
+
         }
+        let name = msgs.data.userName;
+        if (msgs.state == 100) {
+            v.$notify({
+                title: name,
+                message: msgs.message,
+                showClose: false,
+                duration: 8000,
+                position: 'top-right',
+                type: 'info'
+            });
+        } else if (msgs.state != 200) {
+            v.$notify({
+                title: name,
+                message: "投图失败，原因【" + msgs.data.map + '|' + msgs.message + '】',
+                showClose: false,
+                duration: 8000,
+                position: 'top-right',
+                type: 'error'
+            });
+        } else if (msgs.state == 200) {
+            v.$notify({
+                title: name,
+                message: "收到投图【" + msgs.data.map + '|' + msgs.data.name + '】',
+                showClose: false,
+                duration: 8000,
+                position: 'top-right',
+                type: 'success'
+            });
+        }
+
     });
     // 连接关闭时:
     ws.addEventListener('close', function () {

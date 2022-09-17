@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class MapInfo {
+	private String error;
 	private String userName;
 	private String danmu;
 	private String map;
