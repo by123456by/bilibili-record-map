@@ -1,6 +1,7 @@
 package pro.niunai.bilibili.record.map.controller;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 import pro.niunai.bilibili.record.map.pojo.JsonResult;
 import pro.niunai.bilibili.record.map.pojo.MapVO;
@@ -22,6 +23,7 @@ import static pro.niunai.bilibili.record.map.pojo.ResponseCode.CONTINUE;
  */
 @ServerEndpoint("/danmuWs")
 @Component
+@Log
 public class DanmuWsServerEndpoint {
 	public static HashMap<String, Session> map = new HashMap<>();
 
@@ -32,7 +34,7 @@ public class DanmuWsServerEndpoint {
 	 */
 	@OnOpen
 	public void onOpen(Session session) {
-		System.out.println("弹幕回显连接成功");
+		log.info("弹幕回显连接成功");
 		map.put(session.getId(), session);
 		MapVO mapVO = new MapVO();
 		mapVO.setUserName("系统");
@@ -46,7 +48,7 @@ public class DanmuWsServerEndpoint {
 	 */
 	@OnClose
 	public void onClose(Session session) {
-		System.out.println("弹幕回显连接关闭");
+		log.info("弹幕回显连接关闭");
 		map.remove(session.getId());
 	}
 

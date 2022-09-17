@@ -1,6 +1,7 @@
 package pro.niunai.bilibili.record.map.controller;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.OnClose;
@@ -17,6 +18,7 @@ import java.util.HashMap;
  */
 @ServerEndpoint("/adminWs")
 @Component
+@Log
 public class AdminWsServerEndpoint {
 	public static HashMap<String, Session> map = new HashMap<>();
 	/**
@@ -25,7 +27,7 @@ public class AdminWsServerEndpoint {
 	 */
 	@OnOpen
 	public void onOpen(Session session) {
-		System.out.println("后台查看连接成功");
+		log.info("后台查看连接成功");
 		map.put(session.getId(), session);
 
 	}
@@ -36,7 +38,7 @@ public class AdminWsServerEndpoint {
 	 */
 	@OnClose
 	public void onClose(Session session) {
-		System.out.println("后台查看连接关闭");
+		log.info("后台查看连接关闭");
 		map.remove(session.getId());
 	}
 
