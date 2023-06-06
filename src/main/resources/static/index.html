@@ -92,13 +92,13 @@
                 <span style="color: #66b1ff">
                     <!--{{p.gameStyleName}}-->
                     <el-tooltip class="item" effect="light" :content="gameStyleCN(p.gameStyle)" placement="top">
-                         <el-image :src="'./img/style'+p.gameStyle+'.png'" lazy style="height: 24px;"></el-image>
+                         <el-image :src="'./img/style'+p.gameStyle+'.png'" lazy style="height: 24px;width: 45px;"></el-image>
                     </el-tooltip>
                 </span>
                 <span style="color: #5daf34">
                     <!--{{p.themeName}}-->
                     <el-tooltip class="item" effect="light" :content="themeCN(p.theme)" placement="top">
-                        <el-image :src="'./img/theme'+p.theme+'.png'" lazy style="height: 24px;"></el-image>
+                        <el-image :src="'./img/theme'+p.theme+'.png'" lazy style="height: 24px;width: 45px;"></el-image>
                     </el-tooltip>
                 </span>
                 <span style="line-height: 24px;" @click="fanyiName(i)">{{p.name}}</span>

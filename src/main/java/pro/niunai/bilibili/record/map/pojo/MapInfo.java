@@ -66,7 +66,7 @@ public class MapInfo {
 	private Integer clears;
 	@JsonProperty("attempts")
 	private Integer attempts;
-	@JsonProperty("clear_rate")
+	@JsonProperty("clear_rate_pretty")//TODO:数据库应该改的，先这样凑合吧
 	private String clearRate;
 	@JsonProperty("plays")
 	private Integer plays;

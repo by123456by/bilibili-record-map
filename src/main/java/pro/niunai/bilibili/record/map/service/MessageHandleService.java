@@ -20,6 +20,7 @@ import java.util.zip.Inflater;
 
 /**
  * 消息解析
+ *
  * @author 本間Saki
  */
 @Slf4j
@@ -32,11 +33,13 @@ public class MessageHandleService {
 	public void messageHandle(ByteBuffer message) throws DataFormatException {
 		List<String> s = messageToJson(message);
 		for (String s1 : s) {
-//            System.out.println(s1);
-//			log.trace("消息为：{}", s1);
+//			if (s1.contains("DANMU_MSG")) {
+//				log.trace("消息为：{}", s1);
+//			}
 			if (s1.contains("cmd")) {
 				JSONObject json = JSON.parseObject(s1);
 				if ("DANMU_MSG".equals(json.getString("cmd"))) {
+					//DANMU_MSG:4:0:2:2:2:0
 //					log.trace("消息为：{}", s1);`
 					JSONArray info = json.getJSONArray("info");
 					String msg = info.getString(1);
